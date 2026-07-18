@@ -1,4 +1,4 @@
-# agent-skills
+# skills
 
 Reusable agent skills in the [SKILL.md](https://developers.openai.com/codex/skills) format,
 compatible with OpenAI Codex, Claude Code, and other agents that follow the convention.
@@ -23,9 +23,9 @@ The skills are designed to chain: draft with `plan-application`, attack the draf
 Symlink (or copy) the skill folders into `~/.codex/skills/`:
 
 ```bash
-git clone https://github.com/JacobStephens2/agent-skills.git
+git clone https://github.com/JacobStephens2/skills.git
 mkdir -p ~/.codex/skills
-for d in agent-skills/*/; do ln -s "$(pwd)/${d%/}" ~/.codex/skills/"$(basename "$d")"; done
+for d in skills/*/; do ln -s "$(pwd)/${d%/}" ~/.codex/skills/"$(basename "$d")"; done
 ```
 
 Restart Codex, then invoke a skill with `$plan-application` (or let it auto-activate when a
@@ -33,7 +33,7 @@ request matches its description). You can also install a single skill from this 
 Codex with the skill installer:
 
 ```
-$skill-installer JacobStephens2/agent-skills/plan-application
+$skill-installer JacobStephens2/skills/plan-application
 ```
 
 ### Claude Code
