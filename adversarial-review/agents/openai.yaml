@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adversarial Review"
+  short_description: "Stress-test plans before implementation"
+  default_prompt: "Use $adversarial-review to challenge this plan and identify blockers before implementation."
