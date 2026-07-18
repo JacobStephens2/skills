@@ -1,6 +1,6 @@
 ---
 name: adversarial-review
-description: Perform skeptical, evidence-backed senior-engineering reviews of implementation, architecture, migration, rollout, operations, and build-vs-buy plans. Use when asked to adversarially review, red-team, stress-test, challenge, approve or reject a plan; identify blockers and unsupported assumptions; run a pre-mortem; assess whether a design is ready for implementation; or revise a plan after finding security, reliability, feasibility, migration, testing, observability, or operational gaps.
+description: Perform skeptical, evidence-backed senior-engineering reviews of implementation, architecture, migration, rollout, operations, and build-vs-buy plans, and save the completed review as a Markdown artifact in the target tree. Use when asked to adversarially review, red-team, stress-test, challenge, approve or reject a plan; identify blockers and unsupported assumptions; run a pre-mortem; assess whether a design is ready for implementation; or revise a plan after finding security, reliability, feasibility, migration, testing, observability, or operational gaps.
 ---
 
 # Adversarial Review
@@ -23,7 +23,8 @@ cause costly failure. Do not manufacture findings to appear thorough.
    or memory. Cite external evidence close to the finding it supports.
 6. Label anything that cannot be established as **needs verification**. Do not convert uncertainty
    into a factual defect.
-7. Keep the review read-only unless the user explicitly asks to write or revise an artifact.
+7. Keep plan and system inspection read-only. Creating the required review artifact is permitted;
+   do not revise the plan or other artifacts unless the user explicitly asks.
 
 Do not review the plan in isolation when its claims can be checked against the actual system.
 
@@ -134,9 +135,29 @@ Make recommendations executable. Prefer:
 Do not recommend generic actions such as “add more tests” or “improve security.” Name the exact test,
 control, decision, owner, threshold, or artifact needed.
 
+### 7. Save the review artifact
+
+Always write the complete review to a Markdown file; do not leave the only copy in chat.
+
+1. Resolve the target root. If the target is a directory, use that directory. If it is a file, use
+   its parent. If the user supplied only pasted content, use the current workspace root when one is
+   available; otherwise ask for a writable destination before completing the review.
+2. Keep the artifact inside the target root unless the user specifies another destination. Reuse an
+   established review location such as `reviews/`, `docs/reviews/`, or `design/reviews/` when present;
+   otherwise create `reviews/` under the target root.
+3. For a directory target, name the file `adversarial-review-YYYY-MM-DD.md`. For a file target, name
+   it `<target-stem>-adversarial-review-YYYY-MM-DD.md`. If that path exists, append `-2`, `-3`, and so
+   on rather than overwriting a prior review.
+4. Put the entire readiness assessment, ranked findings, pre-mortem, and final assessment in the
+   artifact. Treat it as the source of truth; the chat response should link to it and summarize only
+   the verdict and blocking issues unless the user asks for the full review inline.
+5. Verify that the file exists and contains every required section before reporting completion. If
+   the write fails, do not claim success; report the exact failure and provide the review inline.
+
 ## Output format
 
-Lead with a one- or two-sentence readiness assessment, without diluting the final verdict.
+The saved Markdown artifact must lead with a one- or two-sentence readiness assessment, without
+diluting the final verdict.
 
 Rank findings by severity, then by expected impact and likelihood. Use this schema for every finding:
 
@@ -204,4 +225,6 @@ Before delivering, verify that:
 - recommendations are specific and proportionate;
 - the five pre-mortem causes are plausible causal stories, not renamed findings;
 - the verdict follows from the blocking issues;
-- the revised outline could guide the author’s next draft.
+- the revised outline could guide the author’s next draft;
+- the complete review exists as a collision-safe Markdown artifact inside the target tree; and
+- the final response links to that artifact without claiming a write that did not succeed.
