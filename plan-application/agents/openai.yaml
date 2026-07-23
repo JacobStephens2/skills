@@ -1,4 +1,0 @@
-interface:
-  display_name: "Plan Application"
-  short_description: "Draft an implementation-ready plan for building an application"
-  default_prompt: "Use $plan-application to produce a rigorous build plan for this application before implementation."

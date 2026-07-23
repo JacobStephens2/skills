@@ -1,0 +1,3 @@
+interface:
+  display_name: "Adjudicate Review"
+  short_description: "Adjudicate review findings and revise the plan"

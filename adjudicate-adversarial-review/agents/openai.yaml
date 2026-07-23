@@ -1,4 +1,0 @@
-interface:
-  display_name: "Adjudicate Adversarial Review"
-  short_description: "Adjudicate review findings and revise the plan"
-  default_prompt: "Use $adjudicate-adversarial-review to adjudicate the adversarial review of this plan and produce the revised, implementation-ready plan."
