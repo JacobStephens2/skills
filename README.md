@@ -9,12 +9,17 @@ frontmatter) and optional agent-specific metadata under `agents/`.
 
 | Skill | Purpose |
 |---|---|
-| [`plan-application`](plan-application/) | Produce a rigorous, implementation-ready plan for building an application, with measurable requirements, verification gates, and rollback paths. |
-| [`adversarial-review`](adversarial-review/) | Skeptically stress-test a plan: attack it across correctness, security, feasibility, operations, and more, then deliver ranked findings and a verdict. |
-| [`adjudicate-adversarial-review`](adjudicate-adversarial-review/) | Adjudicate the findings of an adversarial review and decide what actually blocks implementation. |
+| [`plan`](plan/) | Produce a rigorous, implementation-ready plan for building an application. |
+| [`review`](review/) | Adversarial review of a plan: ranked findings and a verdict. |
+| [`adjudicate-review`](adjudicate-review/) | Adjudicate adversarial-review findings and revise the plan. |
+| [`stephens-blog-post`](stephens-blog-post/) | Write and ship interactive, teaching-first posts for [stephens.page/blog](https://stephens.page/blog/) (house template, voice, real live figures, `agents.md`, verification, deploy). |
+| [`domain-modeling`](domain-modeling/) | Build and sharpen a project's domain model (glossary, ADRs). |
+| [`grilling`](grilling/) / [`grill-me`](grill-me/) / [`grill-with-docs`](grill-with-docs/) | Relentless interview to stress-test a plan or design. |
+| [`chisel`](chisel/) | Simplify and cut fat while keeping required meaning. |
+| [`root-cause-analysis`](root-cause-analysis/) | Write a root-cause analysis. |
 
-The skills are designed to chain: draft with `plan-application`, attack the draft with
-`adversarial-review`, then settle disputed findings with `adjudicate-adversarial-review`.
+Planning skills chain: draft with `plan`, attack with `review`, settle with
+`adjudicate-review`.
 
 ## Install
 
