@@ -171,6 +171,38 @@ else
 fi
 
 mkdir -p "$FIX/worktrees/agent-logs"
+CLOG="$FIX/worktrees/agent-logs/codex-human.log"
+CDEST="$FIX/worktrees/agent-logs/parsed.session"
+# Default `codex exec` (no --json) prints a human config summary to stderr.
+cat > "$CLOG" <<'EOF'
+# launched 2026-08-31T00:00:00Z issue=4 worktree=wt head=abc123 ref=https://github.com/JacobStephens2/skills/issues/4
+OpenAI Codex v0.50.0
+--------
+workdir: /tmp/wt
+model: gpt-5
+provider: openai
+approval: never
+sandbox: danger-full-access
+reasoning effort: medium
+reasoning summaries: auto
+session id: 0199a213-81c0-7800-8aa1-bbab2a035a53
+--------
+user
+/implement https://github.com/JacobStephens2/skills/issues/4
+EOF
+# shellcheck disable=SC1091
+. "$FIX/implement-spec/scripts/invocation.sh"
+record_session_id "$CLOG" "$CDEST"
+got=
+if [ -s "$CDEST" ]; then
+  got=$(tr -d '[:space:]' < "$CDEST")
+fi
+if [ "$got" = "0199a213-81c0-7800-8aa1-bbab2a035a53" ]; then
+  pass "codex human exec log records a session id"
+else
+  fail "codex human exec log records a session id; got '${got:-<empty>}'"
+fi
+
 printf '01997dac-9581-7de3-b6a0-1df8256f2752\n' > "$FIX/worktrees/agent-logs/issue-4.session"
 
 out=$(RESUME --dry-run --launcher none --cli codex 4 wt "$PF") || fail "none codex resume --dry-run exited $?"

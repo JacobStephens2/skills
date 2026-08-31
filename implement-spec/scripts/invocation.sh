@@ -51,11 +51,11 @@ read_session_id() {
   tr -d '[:space:]' < "$f"
 }
 
-# First `thread_id:` line in a round log, or no-op. Used by launch after spawn.
+# First `session id:` line in a round log, or no-op. Used by launch after spawn.
 record_session_id() {
   local log="$1" dest="$2" sid
   [ -n "$dest" ] && [ -f "$log" ] || return 0
-  sid=$(awk '/^thread_id:[[:space:]]*/ { print $2; exit }' "$log")
+  sid=$(awk '/^session id:[[:space:]]*/ { sub(/^session id:[[:space:]]*/, ""); print; exit }' "$log")
   [ -n "$sid" ] || return 0
   printf '%s\n' "$sid" > "$dest"
 }
