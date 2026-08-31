@@ -1,15 +1,17 @@
 ---
 name: implement-spec
-description: Orchestrate a spec issue to done - one grok agent per ticket, each in its own worktree, landed one branch at a time as the blocking graph unblocks them.
+description: Orchestrate a spec issue to done - inherit this session's CLI or name the invocation, one agent per ticket, each in its own worktree, landed one branch at a time as the blocking graph unblocks them.
 disable-model-invocation: true
-argument-hint: "<spec issue URL, number, or path>"
+argument-hint: "<spec> [use [<launcher>] <cli>]"
 ---
 
-This is the loop `/ask-matt` describes after `/to-tickets`: `/implement` per ticket, a fresh context each time, worked from the **frontier**. A spec arrives as tickets with blocking edges. The **frontier** is the open `ready-for-agent` tickets whose blockers are all closed. This skill drives those to closed; `ready-for-human` tickets stay on the chart until the human closes them. The unit of work is a **round**: one detached headless CLI process of the **invocation** running `/implement` in the ticket's own worktree. A finished branch clears a **gate** before it **lands**. After every landing, you recompute the frontier. You orchestrate. The agents implement and answer review. You land.
+This is the loop `/ask-matt` describes after `/to-tickets`: `/implement` per ticket, a fresh context each time, worked from the **frontier**. A spec arrives as tickets with blocking edges. The **frontier** is the open `ready-for-agent` tickets whose blockers are all closed. This skill drives those to closed; `ready-for-human` tickets stay on the chart until the human closes them. The unit of work is a **round**: one detached headless CLI process of the **invocation** running `/implement` in the ticket's own worktree. Bare `/implement-spec <spec>` inherits this session's CLI with launcher none. `use [<launcher>] <cli>` names the invocation. The invocation sticks on the spec's chart; a later orchestrator copies that line rather than re-inheriting. A finished branch clears a **gate** before it **lands**. After every landing, you recompute the frontier. You orchestrate. The agents implement and answer review. You land.
 
 The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`. `docs/agents/issue-tracker.md` holds the forms for sub-issues and blocking edges. [`ROUNDS.md`](ROUNDS.md) is the shell for rounds - launching, resuming, reviewing, and watching - with the scripts beside it in `scripts/`. Read it before the first launch. When a ticket's land base isn't the default branch, read [`LAND-BASE.md`](LAND-BASE.md).
 
 ## Chart the spec
+
+Resolve the **invocation** first. After the spec ref, `use [<launcher>] <cli>` names it; extra words after the CLI are ignored. `use` with no CLI fails closed. A named `use` rewrites the chart line. With no `use`, copy an existing `invocation:` line. With no `use` and no line, inherit this session's CLI and launcher none. If you cannot name this session's CLI, fail closed and ask for `use <cli>`. Write `invocation: <cli>` when the launcher is none, `invocation: va <cli>` when it is `va`. One token is launcher none and that CLI; `va` then a CLI is launcher `va`. Launch, resume, and review spawn that pair.
 
 1. Read the spec, every ticket with its comments, its triage label, and the blocking edges. The tracker's edges are the gate (native `blocked_by` on a real tracker; `Blocked by` lines in local files). A "Blocked by" line in a body is the author's intent at writing time. When a body names a dependency the tracker lacks, add it as a tracker edge before launch, so that you compute the frontier from one source.
 2. For every ticket, write the **land base**: the branch its merge targets. The default is the repo's default branch. A ticket that names an integration branch, or says not to merge it independently to that default, names a different base.
@@ -20,7 +22,7 @@ The issue tracker and triage label vocabulary should have been provided to you. 
 7. Name the other specs in flight on the same land base - their `worktrees/agent-logs/spec-*-chart.md`, their running agents - and the files their open tickets change. Each of their landings costs this spec a merge before its next landing.
 8. Write the **standing rules**: the repo's documented coding standards that apply to every ticket.
 
-Done when `worktrees/agent-logs/spec-<id>-chart.md` holds the table: ticket, blockers, label, worktree, land base, the gate items that are its own, the suite command and shared resources, the standing rules, and the siblings that move the base. `<id>` is the spec issue number, or the file stem for a local spec.
+Done when `worktrees/agent-logs/spec-<id>-chart.md` holds the table: the `invocation:` line, ticket, blockers, label, worktree, land base, the gate items that are its own, the suite command and shared resources, the standing rules, and the siblings that move the base. `<id>` is the spec issue number, or the file stem for a local spec.
 
 ## Prepare worktrees
 
@@ -28,14 +30,14 @@ Fast-forward the primary checkout onto the land base. Make one worktree per open
 
 ## Launch the frontier
 
-Comment the standing rules on every open ticket before the first launch: the implementer's review sub-agent reads the ticket's comments before the implementer commits. Launch each frontier ticket with `scripts/launch.sh` and arm a watch. Run three or four at a time across every session on the box. The limit is the box's memory, not the graph. The prompt is exactly `/implement <ticket>`. The ticket is the brief, and a prompt that restates it becomes a second spec the agent has to reconcile. Done when every frontier ticket has a round running or finished.
+Comment the standing rules on every open ticket before the first launch: the implementer's review sub-agent reads the ticket's comments before the implementer commits. Launch each frontier ticket with `scripts/launch.sh` and the charted launcher and CLI, and arm a watch. Run three or four at a time across every session on the box. The limit is the box's memory, not the graph. The prompt is exactly `/implement <ticket>`. The ticket is the brief, and a prompt that restates it becomes a second spec the agent has to reconcile. Done when every frontier ticket has a round running or finished.
 
 ## Gate a finished branch
 
 1. **Check every acceptance criterion, mechanically where a command can.** Capture the suite with `scripts/suite-capture.sh` and the charted command into `worktrees/agent-logs/`. The implementer's reported count isn't the gate. Run the extra gate commands from the table. Read each test the ticket asked for against the criterion's words: a filter that admits what the criterion forbids is a weakened rule, not a passing test. Put the checks a spec repeats at every gate into one script at the first gate, diffed against the merge-base. The agent's report covers what no command can. Read it against the ticket's criteria, one by one.
 2. **Check the spec's traps for this ticket**, from your table.
-3. **Run a second `/code-review`** as a fresh agent of the invocation, with `scripts/review.sh`, against the merge-base of the ticket branch and its land base - the commit the worktree held at launch. The implementer ran one and answered it. The second still finds real things: a check that lost one of its two directions, a rule weakened to keep a test green.
-4. **Send findings back to the branch's own agent** with `scripts/resume.sh`: every hard finding, and every judgment call that changes what the ticket lands. The agent holds the context, and you hold the list. Arm a new watch. Gate again when it returns.
+3. **Run a second `/code-review`** as a fresh agent of the invocation, with `scripts/review.sh` and the charted launcher and CLI, against the merge-base of the ticket branch and its land base - the commit the worktree held at launch. The implementer ran one and answered it. The second still finds real things: a check that lost one of its two directions, a rule weakened to keep a test green.
+4. **Send findings back to the branch's own agent** with `scripts/resume.sh` and the charted launcher and CLI: every hard finding, and every judgment call that changes what the ticket lands. The agent holds the context, and you hold the list. Arm a new watch. Gate again when it returns.
 
 A branch clears the gate when every mechanical criterion is true on its tree and no hard finding stands. A human-witness trap stays on its ticket.
 

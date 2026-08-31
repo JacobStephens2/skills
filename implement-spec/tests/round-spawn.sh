@@ -74,11 +74,28 @@ assert_argv() {
   pass "$name"
 }
 
+assert_required() {
+  local name="$1" rc="$2" err="$3"
+  if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'required'; then
+    pass "$name"
+  else
+    fail "$name; rc=$rc out: $err"
+  fi
+}
+
 setup_fixture
 
-out=$(LAUNCH --dry-run 4 wt "$REF") || fail "omitted invocation launch --dry-run exited $?"
-assert_argv "omitted invocation launch dry-prints today's va grok command" "$out" \
-  va grok --always-approve -p "/implement $REF"
+rc=0
+err=$(LAUNCH --dry-run 4 wt "$REF" 2>&1) || rc=$?
+assert_required "omitted invocation launch exits non-zero" "$rc" "$err"
+
+rc=0
+err=$(LAUNCH --dry-run --cli grok 4 wt "$REF" 2>&1) || rc=$?
+assert_required "launch with only --cli exits non-zero" "$rc" "$err"
+
+rc=0
+err=$(LAUNCH --dry-run --launcher none 4 wt "$REF" 2>&1) || rc=$?
+assert_required "launch with only --launcher exits non-zero" "$rc" "$err"
 
 out=$(LAUNCH --dry-run --launcher va --cli grok 4 wt "$REF") || fail "va grok launch --dry-run exited $?"
 assert_argv "launcher va CLI grok launch matches today's va grok command" "$out" \
@@ -89,7 +106,7 @@ assert_argv "launcher none CLI grok launch is bare grok with non-interactive per
   grok --always-approve -p "/implement $REF"
 
 rc=0
-err=$(LAUNCH --dry-run --cli unknown 4 wt "$REF" 2>&1) || rc=$?
+err=$(LAUNCH --dry-run --launcher none --cli unknown 4 wt "$REF" 2>&1) || rc=$?
 if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'unknown CLI'; then
   pass "unknown CLI launch exits non-zero"
 else
@@ -98,7 +115,7 @@ fi
 
 echo dirt > "$FIX/worktrees/wt/dirty"
 rc=0
-err=$(LAUNCH --dry-run 4 wt "$REF" 2>&1) || rc=$?
+err=$(LAUNCH --dry-run --launcher none --cli grok 4 wt "$REF" 2>&1) || rc=$?
 if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'not clean'; then
   pass "dirty worktree refuses launch"
 else
@@ -109,9 +126,9 @@ rm -f "$FIX/worktrees/wt/dirty"
 PF="$FIX/prompt.txt"
 printf 'review findings\n' > "$PF"
 
-out=$(RESUME --dry-run 4 wt "$PF") || fail "omitted invocation resume --dry-run exited $?"
-assert_argv "omitted invocation resume dry-prints today's va grok continue" "$out" \
-  va grok --always-approve -c -p "review findings"
+rc=0
+err=$(RESUME --dry-run 4 wt "$PF" 2>&1) || rc=$?
+assert_required "omitted invocation resume exits non-zero" "$rc" "$err"
 
 out=$(RESUME --dry-run --launcher va --cli grok 4 wt "$PF") || fail "va grok resume --dry-run exited $?"
 assert_argv "launcher va CLI grok resume includes continue" "$out" \
@@ -122,7 +139,7 @@ assert_argv "launcher none CLI grok resume is bare grok continue" "$out" \
   grok --always-approve -c -p "review findings"
 
 rc=0
-err=$(RESUME --dry-run --cli unknown 4 wt "$PF" 2>&1) || rc=$?
+err=$(RESUME --dry-run --launcher none --cli unknown 4 wt "$PF" 2>&1) || rc=$?
 if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'unknown CLI'; then
   pass "unknown CLI resume exits non-zero"
 else
@@ -132,9 +149,9 @@ fi
 FP=abc123
 REVIEW_PROMPT="/code-review $FP. The originating ticket is #4: fetch it with the workflow in docs/agents/issue-tracker.md (the repo may be private; a web fetch will not open it). Report only; edit nothing."
 
-out=$(REVIEW --dry-run 4 wt "$FP") || fail "omitted invocation review --dry-run exited $?"
-assert_argv "omitted invocation review dry-prints today's fresh va grok command" "$out" \
-  va grok --always-approve -p "$REVIEW_PROMPT"
+rc=0
+err=$(REVIEW --dry-run 4 wt "$FP" 2>&1) || rc=$?
+assert_required "omitted invocation review exits non-zero" "$rc" "$err"
 
 out=$(REVIEW --dry-run --launcher va --cli grok 4 wt "$FP") || fail "va grok review --dry-run exited $?"
 assert_argv "launcher va CLI grok review matches today's fresh va grok command" "$out" \
@@ -145,7 +162,7 @@ assert_argv "launcher none CLI grok review is a fresh bare grok command" "$out" 
   grok --always-approve -p "$REVIEW_PROMPT"
 
 rc=0
-err=$(REVIEW --dry-run --cli unknown 4 wt "$FP" 2>&1) || rc=$?
+err=$(REVIEW --dry-run --launcher none --cli unknown 4 wt "$FP" 2>&1) || rc=$?
 if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'unknown CLI'; then
   pass "unknown CLI review exits non-zero"
 else
