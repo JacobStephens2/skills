@@ -4,7 +4,7 @@ A **round** is one detached, headless CLI process of the **invocation** in a tic
 
 ## How a round runs
 
-Spawn the invocation: a detached headless CLI process, launched from inside the worktree. The invocation is launcher and CLI; omitted, it is launcher `va` and CLI grok. In the worktree, the CLI discovers the project skills - `/implement`, `/code-review`, `/tdd` - so the prompt is a skill invocation. Resume uses the invocation's continue so findings go back to the agent that has the context.
+Spawn the invocation: a detached headless CLI process, launched from inside the worktree. The invocation is launcher and CLI; omitted, it is launcher `va` and CLI grok. In the worktree, the CLI discovers the project skills - `/implement`, `/code-review`, `/tdd` - so the prompt is a skill. Resume uses the invocation's continue so findings go back to the agent that has the context.
 
 The scripts detach every round into a new session, so nothing in the orchestrator's tool timeouts can end it. A round appends to `worktrees/agent-logs/issue-<n>.log` and writes `<log>.exit` with the exit code when it ends. The `.exit` file is the completion signal a watch polls for. `.gitignore` lists `worktrees/`.
 
