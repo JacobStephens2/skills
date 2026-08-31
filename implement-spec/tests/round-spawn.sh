@@ -105,6 +105,14 @@ out=$(LAUNCH --dry-run --launcher none --cli grok 4 wt "$REF") || fail "none gro
 assert_argv "launcher none CLI grok launch is bare grok with non-interactive permission flags" "$out" \
   grok --always-approve -p "/implement $REF"
 
+out=$(LAUNCH --dry-run --launcher none --cli codex 4 wt "$REF") || fail "none codex launch --dry-run exited $?"
+assert_argv "launcher none CLI codex launch is Codex headless exec with non-interactive permission flags" "$out" \
+  codex exec --dangerously-bypass-approvals-and-sandbox "/implement $REF"
+
+out=$(LAUNCH --dry-run --launcher va --cli codex 4 wt "$REF") || fail "va codex launch --dry-run exited $?"
+assert_argv "launcher va CLI codex launch prefixes va" "$out" \
+  va codex exec --dangerously-bypass-approvals-and-sandbox "/implement $REF"
+
 rc=0
 err=$(LAUNCH --dry-run --launcher none --cli unknown 4 wt "$REF" 2>&1) || rc=$?
 if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'unknown CLI'; then
@@ -139,6 +147,25 @@ assert_argv "launcher none CLI grok resume is bare grok continue" "$out" \
   grok --always-approve -c -p "review findings"
 
 rc=0
+err=$(RESUME --dry-run --launcher none --cli codex 4 wt "$PF" 2>&1) || rc=$?
+if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'session id'; then
+  pass "codex resume without recorded session id exits non-zero"
+else
+  fail "codex resume without session id rc=$rc out: $err"
+fi
+
+mkdir -p "$FIX/worktrees/agent-logs"
+printf '01997dac-9581-7de3-b6a0-1df8256f2752\n' > "$FIX/worktrees/agent-logs/issue-4.session"
+
+out=$(RESUME --dry-run --launcher none --cli codex 4 wt "$PF") || fail "none codex resume --dry-run exited $?"
+assert_argv "launcher none CLI codex resume includes the recorded session id" "$out" \
+  codex exec resume --dangerously-bypass-approvals-and-sandbox 01997dac-9581-7de3-b6a0-1df8256f2752 "review findings"
+
+out=$(RESUME --dry-run --launcher va --cli codex 4 wt "$PF") || fail "va codex resume --dry-run exited $?"
+assert_argv "launcher va CLI codex resume prefixes va and includes the recorded session id" "$out" \
+  va codex exec resume --dangerously-bypass-approvals-and-sandbox 01997dac-9581-7de3-b6a0-1df8256f2752 "review findings"
+
+rc=0
 err=$(RESUME --dry-run --launcher none --cli unknown 4 wt "$PF" 2>&1) || rc=$?
 if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'unknown CLI'; then
   pass "unknown CLI resume exits non-zero"
@@ -160,6 +187,14 @@ assert_argv "launcher va CLI grok review matches today's fresh va grok command" 
 out=$(REVIEW --dry-run --launcher none --cli grok 4 wt "$FP") || fail "none grok review --dry-run exited $?"
 assert_argv "launcher none CLI grok review is a fresh bare grok command" "$out" \
   grok --always-approve -p "$REVIEW_PROMPT"
+
+out=$(REVIEW --dry-run --launcher none --cli codex 4 wt "$FP") || fail "none codex review --dry-run exited $?"
+assert_argv "launcher none CLI codex review is a fresh Codex exec of the same invocation" "$out" \
+  codex exec --dangerously-bypass-approvals-and-sandbox "$REVIEW_PROMPT"
+
+out=$(REVIEW --dry-run --launcher va --cli codex 4 wt "$FP") || fail "va codex review --dry-run exited $?"
+assert_argv "launcher va CLI codex review prefixes va on a fresh Codex exec" "$out" \
+  va codex exec --dangerously-bypass-approvals-and-sandbox "$REVIEW_PROMPT"
 
 rc=0
 err=$(REVIEW --dry-run --launcher none --cli unknown 4 wt "$FP" 2>&1) || rc=$?

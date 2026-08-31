@@ -38,6 +38,11 @@ echo "# launched $(date -u +%FT%TZ) issue=$ISSUE worktree=$WT head=$(git rev-par
 export ROUND_LOG="$LOG"
 RETRY=0; [ "$LAUNCHER" = va ] && RETRY=1
 export ROUND_RETRY="$RETRY"
+ROUND_SESSION=$(session_record_file)
+if [ -n "$ROUND_SESSION" ]; then
+  export ROUND_SESSION
+  export INVOCATION_SH="$SCRIPT_DIR/invocation.sh"
+fi
 # shellcheck disable=SC2016 # The detached Bash expands this script.
 PID=$("$SCRIPT_DIR/detach.sh" bash -c '
 rc=1
@@ -55,6 +60,11 @@ for attempt in $(seq 1 "$attempts"); do
   echo "# vault rate-limited before session start; retrying in ${delay}s" >> "$ROUND_LOG"
   sleep "$delay"
 done
+if [ -n "${ROUND_SESSION:-}" ]; then
+  # shellcheck disable=SC1091
+  . "$INVOCATION_SH"
+  record_session_id "$ROUND_LOG" "$ROUND_SESSION"
+fi
 printf "%s\n" "$rc" > "$ROUND_LOG.exit"
 printf "# exited %s at %s\n" "$rc" "$(date -u +%FT%TZ)" >> "$ROUND_LOG"
 ' round "${INVOCATION_CMD[@]}")
