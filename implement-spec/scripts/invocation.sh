@@ -6,8 +6,8 @@
 # shellcheck disable=SC2034
 parse_round_flags() {
   DRY=0
-  LAUNCHER=va
-  CLI=grok
+  LAUNCHER=
+  CLI=
   WANT_HELP=0
   ROUND_ARGS=()
   while [ $# -gt 0 ]; do
@@ -21,10 +21,17 @@ parse_round_flags() {
   done
 }
 
+require_invocation() {
+  if [ -z "$LAUNCHER" ] || [ -z "$CLI" ]; then
+    echo "launcher and CLI are required (--launcher, --cli)" >&2
+    return 1
+  fi
+}
+
 print_invocation_help() {
   echo "  --dry-run              print the command without detaching"
-  echo "  --launcher <launcher>  va or none (default va)"
-  echo "  --cli <cli>            grok (default grok)"
+  echo "  --launcher <launcher>  va or none (required)"
+  echo "  --cli <cli>            grok (required)"
 }
 
 # shellcheck disable=SC2034
