@@ -5,6 +5,12 @@ compatible with OpenAI Codex, Claude Code, and other agents that follow the conv
 Each skill is a directory containing a `SKILL.md` (instructions plus `name`/`description`
 frontmatter) and optional agent-specific metadata under `agents/`.
 
+The **source** of a skill this repo maintains is the directory at the repo root
+(`implement-spec/`, `plan/`, …). Edit those folders. `.agents/skills/` is what this
+repo *uses*: vendor skills are real directories locked in `skills-lock.json`;
+skills maintained here are symlinks back to the root folder, so `/implement-spec`
+(and the others) run against the source in this checkout.
+
 ## Skills
 
 | Skill | Purpose |
