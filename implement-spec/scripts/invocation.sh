@@ -31,15 +31,17 @@ require_invocation() {
 print_invocation_help() {
   echo "  --dry-run              print the command without detaching"
   echo "  --launcher <launcher>  va or none (required)"
-  echo "  --cli <cli>            grok (required)"
+  echo "  --cli <cli>            grok or claude (required)"
 }
 
 # shellcheck disable=SC2034
 build_invocation() {
   local launcher="$1" cli="$2" kind="$3" prompt="$4"
+  local permission_flag
   INVOCATION_CMD=()
   case "$cli" in
-    grok) ;;
+    grok) permission_flag=--always-approve ;;
+    claude) permission_flag=--dangerously-skip-permissions ;;
     *) echo "unknown CLI: $cli" >&2; return 1 ;;
   esac
   case "$launcher" in
@@ -47,7 +49,7 @@ build_invocation() {
     none) ;;
     *) echo "unknown launcher: $launcher" >&2; return 1 ;;
   esac
-  INVOCATION_CMD+=("$cli" --always-approve)
+  INVOCATION_CMD+=("$cli" "$permission_flag")
   [ "$kind" = resume ] && INVOCATION_CMD+=(-c)
   INVOCATION_CMD+=(-p "$prompt")
 }
