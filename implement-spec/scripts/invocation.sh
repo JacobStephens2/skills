@@ -31,7 +31,33 @@ require_invocation() {
 print_invocation_help() {
   echo "  --dry-run              print the command without detaching"
   echo "  --launcher <launcher>  va or none (required)"
-  echo "  --cli <cli>            grok or claude (required)"
+  echo "  --cli <cli>            grok, claude, or codex (required)"
+}
+
+# Session-id file for CLIs that record one; empty otherwise.
+session_record_file() {
+  case "$CLI" in
+    codex) printf '%s\n' "$ROOT/worktrees/agent-logs/issue-$ISSUE.session" ;;
+  esac
+}
+
+read_session_id() {
+  local f
+  f=$(session_record_file)
+  if [ ! -s "$f" ]; then
+    echo "no recorded session id for issue $ISSUE" >&2
+    return 1
+  fi
+  tr -d '[:space:]' < "$f"
+}
+
+# First `session id:` line in a round log, or no-op. Used by launch after spawn.
+record_session_id() {
+  local log="$1" dest="$2" sid
+  [ -n "$dest" ] && [ -f "$log" ] || return 0
+  sid=$(awk '/^session id:[[:space:]]*/ { sub(/^session id:[[:space:]]*/, ""); print; exit }' "$log")
+  [ -n "$sid" ] || return 0
+  printf '%s\n' "$sid" > "$dest"
 }
 
 # shellcheck disable=SC2034
@@ -42,6 +68,7 @@ build_invocation() {
   case "$cli" in
     grok) permission_flag=--always-approve ;;
     claude) permission_flag=--dangerously-skip-permissions ;;
+    codex) ;;
     *) echo "unknown CLI: $cli" >&2; return 1 ;;
   esac
   case "$launcher" in
@@ -49,6 +76,17 @@ build_invocation() {
     none) ;;
     *) echo "unknown launcher: $launcher" >&2; return 1 ;;
   esac
+  if [ "$cli" = codex ]; then
+    INVOCATION_CMD+=(codex exec)
+    if [ "$kind" = resume ]; then
+      local sid
+      sid=$(read_session_id) || return 1
+      INVOCATION_CMD+=(resume --dangerously-bypass-approvals-and-sandbox "$sid" "$prompt")
+    else
+      INVOCATION_CMD+=(--dangerously-bypass-approvals-and-sandbox "$prompt")
+    fi
+    return 0
+  fi
   INVOCATION_CMD+=("$cli" "$permission_flag")
   [ "$kind" = resume ] && INVOCATION_CMD+=(-c)
   INVOCATION_CMD+=(-p "$prompt")
