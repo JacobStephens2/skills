@@ -31,7 +31,7 @@ require_invocation() {
 print_invocation_help() {
   echo "  --dry-run              print the command without detaching"
   echo "  --launcher <launcher>  va or none (required)"
-  echo "  --cli <cli>            grok or codex (required)"
+  echo "  --cli <cli>            grok, claude, or codex (required)"
 }
 
 # Session-id file for CLIs that record one; empty otherwise.
@@ -63,9 +63,12 @@ record_session_id() {
 # shellcheck disable=SC2034
 build_invocation() {
   local launcher="$1" cli="$2" kind="$3" prompt="$4"
+  local permission_flag
   INVOCATION_CMD=()
   case "$cli" in
-    grok|codex) ;;
+    grok) permission_flag=--always-approve ;;
+    claude) permission_flag=--dangerously-skip-permissions ;;
+    codex) ;;
     *) echo "unknown CLI: $cli" >&2; return 1 ;;
   esac
   case "$launcher" in
@@ -73,23 +76,20 @@ build_invocation() {
     none) ;;
     *) echo "unknown launcher: $launcher" >&2; return 1 ;;
   esac
-  case "$cli" in
-    grok)
-      INVOCATION_CMD+=(grok --always-approve)
-      [ "$kind" = resume ] && INVOCATION_CMD+=(-c)
-      INVOCATION_CMD+=(-p "$prompt")
-      ;;
-    codex)
-      INVOCATION_CMD+=(codex exec)
-      if [ "$kind" = resume ]; then
-        local sid
-        sid=$(read_session_id) || return 1
-        INVOCATION_CMD+=(resume --dangerously-bypass-approvals-and-sandbox "$sid" "$prompt")
-      else
-        INVOCATION_CMD+=(--dangerously-bypass-approvals-and-sandbox "$prompt")
-      fi
-      ;;
-  esac
+  if [ "$cli" = codex ]; then
+    INVOCATION_CMD+=(codex exec)
+    if [ "$kind" = resume ]; then
+      local sid
+      sid=$(read_session_id) || return 1
+      INVOCATION_CMD+=(resume --dangerously-bypass-approvals-and-sandbox "$sid" "$prompt")
+    else
+      INVOCATION_CMD+=(--dangerously-bypass-approvals-and-sandbox "$prompt")
+    fi
+    return 0
+  fi
+  INVOCATION_CMD+=("$cli" "$permission_flag")
+  [ "$kind" = resume ] && INVOCATION_CMD+=(-c)
+  INVOCATION_CMD+=(-p "$prompt")
 }
 
 print_would() {

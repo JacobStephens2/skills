@@ -101,9 +101,17 @@ out=$(LAUNCH --dry-run --launcher va --cli grok 4 wt "$REF") || fail "va grok la
 assert_argv "launcher va CLI grok launch matches today's va grok command" "$out" \
   va grok --always-approve -p "/implement $REF"
 
+out=$(LAUNCH --dry-run --launcher va --cli claude 4 wt "$REF") || fail "va claude launch --dry-run exited $?"
+assert_argv "launcher va CLI claude launch prefixes va" "$out" \
+  va claude --dangerously-skip-permissions -p "/implement $REF"
+
 out=$(LAUNCH --dry-run --launcher none --cli grok 4 wt "$REF") || fail "none grok launch --dry-run exited $?"
 assert_argv "launcher none CLI grok launch is bare grok with non-interactive permission flags" "$out" \
   grok --always-approve -p "/implement $REF"
+
+out=$(LAUNCH --dry-run --launcher none --cli claude 4 wt "$REF") || fail "none claude launch --dry-run exited $?"
+assert_argv "launcher none CLI claude launch is bare claude with non-interactive permission flags" "$out" \
+  claude --dangerously-skip-permissions -p "/implement $REF"
 
 out=$(LAUNCH --dry-run --launcher none --cli codex 4 wt "$REF") || fail "none codex launch --dry-run exited $?"
 assert_argv "launcher none CLI codex launch is Codex headless exec with non-interactive permission flags" "$out" \
@@ -146,6 +154,14 @@ out=$(RESUME --dry-run --launcher none --cli grok 4 wt "$PF") || fail "none grok
 assert_argv "launcher none CLI grok resume is bare grok continue" "$out" \
   grok --always-approve -c -p "review findings"
 
+out=$(RESUME --dry-run --launcher va --cli claude 4 wt "$PF") || fail "va claude resume --dry-run exited $?"
+assert_argv "launcher va CLI claude resume uses cwd-scoped continue" "$out" \
+  va claude --dangerously-skip-permissions -c -p "review findings"
+
+out=$(RESUME --dry-run --launcher none --cli claude 4 wt "$PF") || fail "none claude resume --dry-run exited $?"
+assert_argv "launcher none CLI claude resume uses cwd-scoped continue" "$out" \
+  claude --dangerously-skip-permissions -c -p "review findings"
+
 rc=0
 err=$(RESUME --dry-run --launcher none --cli codex 4 wt "$PF" 2>&1) || rc=$?
 if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'session id'; then
@@ -187,6 +203,14 @@ assert_argv "launcher va CLI grok review matches today's fresh va grok command" 
 out=$(REVIEW --dry-run --launcher none --cli grok 4 wt "$FP") || fail "none grok review --dry-run exited $?"
 assert_argv "launcher none CLI grok review is a fresh bare grok command" "$out" \
   grok --always-approve -p "$REVIEW_PROMPT"
+
+out=$(REVIEW --dry-run --launcher va --cli claude 4 wt "$FP") || fail "va claude review --dry-run exited $?"
+assert_argv "launcher va CLI claude review is a fresh claude process of the same invocation" "$out" \
+  va claude --dangerously-skip-permissions -p "$REVIEW_PROMPT"
+
+out=$(REVIEW --dry-run --launcher none --cli claude 4 wt "$FP") || fail "none claude review --dry-run exited $?"
+assert_argv "launcher none CLI claude review is a fresh claude process of the same invocation" "$out" \
+  claude --dangerously-skip-permissions -p "$REVIEW_PROMPT"
 
 out=$(REVIEW --dry-run --launcher none --cli codex 4 wt "$FP") || fail "none codex review --dry-run exited $?"
 assert_argv "launcher none CLI codex review is a fresh Codex exec of the same invocation" "$out" \
