@@ -16,6 +16,7 @@ frontmatter) and optional agent-specific metadata under `agents/`.
 | [`domain-modeling`](domain-modeling/) | Build and sharpen a project's domain model (glossary, ADRs). |
 | [`grilling`](grilling/) / [`grill-me`](grill-me/) / [`grill-with-docs`](grill-with-docs/) | Relentless interview to stress-test a plan or design. |
 | [`chisel`](chisel/) | Simplify and cut fat while keeping required meaning. |
+| [`implement-spec`](implement-spec/) | Drive a spec's tickets to closed: one grok agent per ticket, landed from the blocking graph. |
 | [`root-cause-analysis`](root-cause-analysis/) | Write a root-cause analysis. |
 
 Planning skills chain: draft with `plan`, attack with `review`, settle with

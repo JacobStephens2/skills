@@ -17,7 +17,7 @@ BR=$(git -C "$WT" branch --show-current); H=$(git -C "$WT" rev-parse HEAD); B=$(
 [ -z "$(git -C "$WT" status --porcelain)" ] || { echo "$WT is not clean; refusing" >&2; exit 1; }
 git -C "$ROOT" merge-base --is-ancestor "$B" "$H" || { echo "origin/$BASE (${B:0:7}) is not merged into ${H:0:7}; converge first (automerge.sh or a merge round)" >&2; exit 1; }
 [ -f "$BODY" ] || { echo "no body file $BODY" >&2; exit 1; }
-head -1 "$BODY" | grep -qE "^Closes #$ISSUE\." || echo "note: body's first line is not 'Closes #$ISSUE.'" >&2
+head -1 "$BODY" | grep -qE "^Closes #$ISSUE\.?$" || echo "note: body's first line is not 'Closes #$ISSUE'" >&2
 if [ "$DRY" = 1 ]; then
   echo "would: git -C $WT push -u origin $BR"; echo "would: gh pr create --base $BASE --head $BR --title '$TITLE' --body-file $BODY (from $WT)"
   echo "would: gh pr merge <n> --merge (from $ROOT); git push origin --delete $BR; git fetch origin $BASE:$BASE"; exit 0
