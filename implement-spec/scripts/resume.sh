@@ -1,13 +1,32 @@
 #!/usr/bin/env bash
-# resume.sh <issue> <worktree-name> <prompt-file>: continue the worktree's most recent grok session with the file's text, detached.
+# resume.sh [--dry-run] [--launcher <launcher>] [--cli <cli>] <issue> <worktree-name> <prompt-file>:
+# continue the worktree's most recent session with the file's text, detached, as the invocation.
+# Omitted invocation is launcher va and CLI grok. --dry-run prints the command without detaching.
 set -euo pipefail
-ISSUE="$1"; WT="$2"
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/invocation.sh"
+parse_round_flags "$@"
+if [ "$WANT_HELP" = 1 ]; then
+  echo "usage: resume.sh [--dry-run] [--launcher <launcher>] [--cli <cli>] <issue> <worktree-name> <prompt-file>"
+  echo "Continue the worktree's session with the file's text as the invocation."
+  echo "Omitted invocation is launcher va and CLI grok."
+  print_invocation_help
+  exit 0
+fi
+set -- "${ROUND_ARGS[@]}"
+ISSUE="$1"; WT="$2"
 ROOT=$(cd "$SCRIPT_DIR" && cd "$(git rev-parse --git-common-dir)" && cd .. && pwd)
 PF=$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$3")
 LOG="$ROOT/worktrees/agent-logs/issue-$ISSUE.log"
+PROMPT=$(cat "$PF")
+build_invocation "$LAUNCHER" "$CLI" resume "$PROMPT"
 cd "$ROOT/worktrees/$WT"
+if [ "$DRY" = 1 ]; then
+  print_would
+  exit 0
+fi
 rm -f "$LOG.exit"
 echo "# resumed $(date -u +%FT%TZ) head=$(git rev-parse --short HEAD) prompt=$PF" >> "$LOG"
-PID=$("$SCRIPT_DIR/detach.sh" bash -c "cd '$PWD' && va grok --always-approve -c -p \"\$(cat '$PF')\" >> '$LOG' 2>&1; echo \$? > '$LOG.exit'; echo \"# exited \$(cat '$LOG.exit') at \$(date -u +%FT%TZ)\" >> '$LOG'")
+PID=$("$SCRIPT_DIR/detach.sh" bash -c "cd '$PWD' && \"\$@\" >> '$LOG' 2>&1; echo \$? > '$LOG.exit'; echo \"# exited \$(cat '$LOG.exit') at \$(date -u +%FT%TZ)\" >> '$LOG'" round "${INVOCATION_CMD[@]}")
 echo "resumed issue $ISSUE in $WT (pid $PID)"

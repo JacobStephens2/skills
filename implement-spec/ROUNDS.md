@@ -1,10 +1,10 @@
 # Rounds
 
-A **round** is one detached, headless run of a grok agent in a ticket's worktree. This file is the shell for it. The judgment stays in [`SKILL.md`](SKILL.md).
+A **round** is one detached, headless CLI process of the **invocation** in a ticket's worktree. This file is the shell for it. The judgment stays in [`SKILL.md`](SKILL.md).
 
 ## How a round runs
 
-A round is `va grok --always-approve -p '<prompt>'`, launched from inside the worktree. `va` is `workdir = caller`. `-p` is the single-turn mode: it runs the whole turn with tools and exits when the turn ends, whereas the interactive form never exits and needs a terminal. In the worktree, grok discovers the project skills - `/implement`, `/code-review`, `/tdd` - so the prompt is a skill invocation. `-c` continues the worktree's most recent session, which is how findings go back to the agent that has the context.
+Spawn the invocation: a detached headless CLI process, launched from inside the worktree. The invocation is launcher and CLI; omitted, it is launcher `va` and CLI grok. In the worktree, the CLI discovers the project skills - `/implement`, `/code-review`, `/tdd` - so the prompt is a skill invocation. Resume uses the invocation's continue so findings go back to the agent that has the context.
 
 The scripts detach every round into a new session, so nothing in the orchestrator's tool timeouts can end it. A round appends to `worktrees/agent-logs/issue-<n>.log` and writes `<log>.exit` with the exit code when it ends. The `.exit` file is the completion signal a watch polls for. `.gitignore` lists `worktrees/`.
 
@@ -14,9 +14,9 @@ The implementer commits on the branch. It doesn't push, open a PR, or close the 
 
 All of them take the primary checkout as their root, found from the skill's own location, so they run from anywhere. They read the default branch rather than assume it: `git symbolic-ref --short refs/remotes/origin/HEAD` names it. If that ref is unset, `git remote set-head origin -a` sets it from the remote.
 
-- `scripts/launch.sh <issue> <worktree-name> [<ticket-ref>]`: refuses a dirty worktree, then runs `/implement <ticket-ref>`. `<ticket-ref>` is the `/implement` argument (URL, number, or path). Default: the GitHub issue URL derived from `origin`. A pre-session Bitwarden 429 gets two bounded, jittered retries; other exits are final.
-- `scripts/resume.sh <issue> <worktree-name> <prompt-file>`: continues the worktree's session with the file's text, such as review findings, a merge round, or a correction. A resume is a new round, so arm a new watch. The worktree is the session, so resume only when no suite and no grok is already running in it.
-- `scripts/review.sh <issue> <worktree-name> <fixed-point>`: a fresh grok agent runs `/code-review <fixed-point>` in the worktree, read-only, into `worktrees/agent-logs/review-<n>.log`. The fixed point is the merge-base of the ticket branch and its land base. Read from the `## Standards` heading.
+- `scripts/launch.sh [--dry-run] [--launcher <launcher>] [--cli <cli>] <issue> <worktree-name> [<ticket-ref>]`: refuses a dirty worktree, then runs `/implement <ticket-ref>` as the invocation. `<ticket-ref>` is the `/implement` argument (URL, number, or path). Default: the GitHub issue URL derived from `origin`. A pre-session Bitwarden 429 gets two bounded, jittered retries when the launcher is `va`; other exits are final.
+- `scripts/resume.sh [--dry-run] [--launcher <launcher>] [--cli <cli>] <issue> <worktree-name> <prompt-file>`: continues the worktree's session with the file's text, such as review findings, a merge round, or a correction. A resume is a new round, so arm a new watch. The worktree is the session, so resume only when no suite and no round is already running in it.
+- `scripts/review.sh [--dry-run] [--launcher <launcher>] [--cli <cli>] <issue> <worktree-name> <fixed-point>`: a fresh agent of the invocation runs `/code-review <fixed-point>` in the worktree, read-only, into `worktrees/agent-logs/review-<n>.log`. The fixed point is the merge-base of the ticket branch and its land base. Read from the `## Standards` heading.
 - `scripts/suite-capture.sh <worktree-name> <label> -- <command>...`: runs `<command>` in the worktree with its exit code into `worktrees/agent-logs/suite-gate-<label>.log` and the code into `<log>.exit`, the marker a chained wait polls for. `<command>` is the suite command from the chart.
 - `scripts/automerge.sh <worktree-name> [<base-ref>]`: for when the land base moved and the dry run is clean. It accepts `main` or `origin/main`, merges the remote base into a detached scratch worktree, `worktrees/<name>-merge`, at the branch tip, proves the tree equals what `git merge-tree` computes, and prints the commit hash. Exit 2 with the conflict list means a merge round. Capture the suite on `<name>-merge`, then `automerge.sh --adopt <worktree-name>` fast-forwards the branch worktree to it and removes the scratch.
 - `scripts/land.sh [--wait-checks] <issue> <worktree-name> <title> <body-file> [<base-ref>]`: GitHub. `--wait-checks` holds the merge until the PR's checks pass and stops without merging when one fails - use it from the first ticket that gives the repo CI onward, and always when a merge triggers a deploy. Accepts `main` or `origin/main` and refuses a dirty worktree or a land base not yet merged into the tip. It pushes and opens the PR from the worktree, merges it from the primary checkout, deletes the remote branch, fast-forwards the local land-base ref, and prints the hash of the merge commit and the state of the issue. Run it with `--dry-run` first to print the commands.
@@ -24,7 +24,7 @@ All of them take the primary checkout as their root, found from the skill's own 
 
 Memory bounds concurrency, and every other session on the box shares that memory. Read available memory before a batch (`/proc/meminfo` or `vm_stat`) and count the agents already running with `pgrep -af 'grok --always-approve'`. Three or four agents plus their sub-agents fit beside a dozen resident sessions. Eleven don't.
 
-A silent log isn't a stalled round. The grok agent writes only its own text, and a suite or a review sub-agent runs for 20 minutes without a line. Before you stop a quiet round, look for a test process whose working directory is the worktree. When you do stop a round, stop it by process ID with `kill <pid>`: a `pkill -f <pattern>` whose pattern matches the orchestrator's own Bash command ends that shell with exit code 144.
+A silent log isn't a stalled round. The round writes only its own text, and a suite or a review sub-agent runs for 20 minutes without a line. Before you stop a quiet round, look for a test process whose working directory is the worktree. When you do stop a round, stop it by process ID with `kill <pid>`: a `pkill -f <pattern>` whose pattern matches the orchestrator's own Bash command ends that shell with exit code 144.
 
 ## Traps
 
