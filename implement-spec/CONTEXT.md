@@ -28,6 +28,18 @@ _Avoid_: grok, claude, invocation, orchestrator
 One detached headless CLI process of the invocation in a ticket's worktree.
 _Avoid_: subagent
 
+**Blocker ledger**:
+The fixed approval bar from the initial review: authority, evidence, and closing outcome for each blocker, plus non-blocking suggestions.
+_Avoid_: latest review, new bar, finding dump
+
+**Initial review**:
+The one independent full review that establishes the blocker ledger.
+_Avoid_: open review, fresh review
+
+**Correction verification**:
+A review against the blocker ledger and regressions introduced after its reviewed head.
+_Avoid_: fresh review, re-review
+
 **Orchestrator**:
 The session that invoked `/implement-spec`.
 _Avoid_: agent

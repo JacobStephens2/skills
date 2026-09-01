@@ -252,6 +252,34 @@ out=$(REVIEW --dry-run --launcher va --cli codex 4 wt "$FP") || fail "va codex r
 assert_argv "launcher va CLI codex review prefixes va on a fresh Codex exec" "$out" \
   va codex exec --dangerously-bypass-approvals-and-sandbox "$REVIEW_PROMPT"
 
+LEDGER="$FIX/worktrees/agent-logs/findings-4.md"
+CORRECTION_BASE=$(git -C "$FIX/worktrees/wt" rev-parse HEAD)
+printf 'reviewed-head: %s\n\n- blocker: exact failure\n' "$CORRECTION_BASE" > "$LEDGER"
+LEDGER=$(cd "$(dirname "$LEDGER")" && pwd)/$(basename "$LEDGER")
+CORRECTION_PROMPT="/code-review $CORRECTION_BASE. The originating ticket is #4: fetch it with the workflow in docs/agents/issue-tracker.md (the repo may be private; a web fetch will not open it). This is a correction verification against a fixed approval bar. Read the blocker ledger at $LEDGER. Verify each recorded blocker against current HEAD and report concrete regressions in the correction diff after $CORRECTION_BASE. Keep pre-existing architectural alternatives and preferences as suggestions, not blockers. Report only; edit nothing."
+
+out=$(REVIEW --dry-run --launcher none --cli grok 4 wt "$CORRECTION_BASE" "$LEDGER") || fail "grok correction review --dry-run exited $?"
+assert_argv "correction review carries the fixed blocker ledger" "$out" \
+  grok --always-approve -p "$CORRECTION_PROMPT"
+
+git -C "$FIX/worktrees/wt" commit -q --allow-empty -m correction
+MISMATCHED_BASE=$(git -C "$FIX/worktrees/wt" rev-parse HEAD)
+rc=0
+err=$(REVIEW --dry-run --launcher none --cli grok 4 wt "$MISMATCHED_BASE" "$LEDGER" 2>&1) || rc=$?
+if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'does not match'; then
+  pass "correction review fixed point must match the blocker ledger"
+else
+  fail "mismatched correction fixed point rc=$rc out: $err"
+fi
+
+rc=0
+err=$(REVIEW --dry-run --launcher none --cli grok 4 wt "$FP" "$FIX/missing-ledger.md" 2>&1) || rc=$?
+if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'blocker ledger not found'; then
+  pass "correction review requires its blocker ledger"
+else
+  fail "missing correction ledger rc=$rc out: $err"
+fi
+
 rc=0
 err=$(REVIEW --dry-run --launcher none --cli unknown 4 wt "$FP" 2>&1) || rc=$?
 if [ "$rc" -ne 0 ] && printf '%s\n' "$err" | grep -q 'unknown CLI'; then
