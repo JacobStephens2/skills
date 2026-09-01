@@ -25,8 +25,16 @@ if [ -n "${4:-}" ]; then
   LEDGER="$4"
   [ -f "$LEDGER" ] || { echo "blocker ledger not found: $LEDGER" >&2; exit 1; }
   LEDGER=$(cd "$(dirname "$LEDGER")" && pwd)/$(basename "$LEDGER")
+  LEDGER_HEAD=$(awk '/^reviewed-head:[[:space:]]*/ { sub(/^reviewed-head:[[:space:]]*/, ""); print; exit }' "$LEDGER")
+  [ -n "$LEDGER_HEAD" ] || { echo "blocker ledger has no reviewed-head: $LEDGER" >&2; exit 1; }
+  cd "$ROOT/worktrees/$WT"
+  FP_COMMIT=$(git rev-parse --verify "$FP^{commit}" 2>/dev/null) || { echo "correction fixed point is not a commit: $FP" >&2; exit 1; }
+  LEDGER_COMMIT=$(git rev-parse --verify "$LEDGER_HEAD^{commit}" 2>/dev/null) || { echo "blocker ledger reviewed-head is not a commit: $LEDGER_HEAD" >&2; exit 1; }
+  [ "$LEDGER_HEAD" = "$LEDGER_COMMIT" ] || { echo "blocker ledger reviewed-head must be the full commit sha" >&2; exit 1; }
+  [ "$FP_COMMIT" = "$LEDGER_COMMIT" ] || { echo "correction fixed point does not match blocker ledger reviewed-head" >&2; exit 1; }
+  git merge-base --is-ancestor "$FP_COMMIT" HEAD || { echo "blocker ledger reviewed-head is not an ancestor of HEAD" >&2; exit 1; }
   MODE=correction
-  PROMPT="/code-review $FP. The originating ticket is #$ISSUE: fetch it with the workflow in docs/agents/issue-tracker.md (the repo may be private; a web fetch will not open it). This is a correction verification against a fixed approval bar. Read the blocker ledger at $LEDGER. Verify each recorded blocker against current HEAD and report concrete regressions introduced after its reviewed-head. Keep pre-existing architectural alternatives and preferences as suggestions, not blockers. Report only; edit nothing."
+  PROMPT="/code-review $FP. The originating ticket is #$ISSUE: fetch it with the workflow in docs/agents/issue-tracker.md (the repo may be private; a web fetch will not open it). This is a correction verification against a fixed approval bar. Read the blocker ledger at $LEDGER. Verify each recorded blocker against current HEAD and report concrete regressions in the correction diff after $FP. Keep pre-existing architectural alternatives and preferences as suggestions, not blockers. Report only; edit nothing."
 fi
 build_invocation "$LAUNCHER" "$CLI" review "$PROMPT"
 cd "$ROOT/worktrees/$WT"
