@@ -22,11 +22,15 @@ skills maintained here are symlinks back to the root folder, so `/implement-spec
 | [`domain-modeling`](domain-modeling/) | Build and sharpen a project's domain model (glossary, ADRs). |
 | [`grilling`](grilling/) / [`grill-me`](grill-me/) / [`grill-with-docs`](grill-with-docs/) | Relentless interview to stress-test a plan or design. |
 | [`chisel`](chisel/) | Simplify and cut fat while keeping required meaning. |
-| [`implement-spec`](implement-spec/) | Drive a spec's tickets to closed: inherit this session's CLI or name the invocation, one agent per ticket, landed from the blocking graph. |
+| [`implement-spec`](implement-spec/) | Drive a spec's tickets to closed one at a time: a subagent round per ticket in its own worktree, gated, then landed from the blocking graph. |
 | [`root-cause-analysis`](root-cause-analysis/) | Write a root-cause analysis. |
 
 Planning skills chain: draft with `plan`, attack with `review`, settle with
 `adjudicate-review`.
+
+For an overnight `implement-spec` run, start the orchestrator in its non-interactive permission mode with an
+auto-compact window near 150k tokens; in Claude Code that is `claude --dangerously-skip-permissions --autocompact 150000`.
+The skill keeps its state in the spec's chart on disk, so a compacted or restarted session picks up where it stopped.
 
 ## Install
 

@@ -1,0 +1,3 @@
+# Rounds run serially
+
+One round at a time on the box, one spec per land base at a time, the next ticket the lowest-numbered one on the frontier, its worktree cut from the current tip when its round starts. Spec #3 ran two frontier tickets in parallel and the second paid a merge round, a re-gate, and a second correction for about ten minutes of wall clock; overnight runs are unattended, so every extra round is a place to fail and wall clock is free. Serial also retires the automatic merge, the memory and concurrency accounting, and the sibling-spec bookkeeping, which carried most of the skill's OS-specific instructions.

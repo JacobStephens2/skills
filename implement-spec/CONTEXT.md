@@ -1,32 +1,32 @@
 # Implement spec
 
-The language for driving a spec's tickets to closed from the blocking graph.
+The language for driving a spec's tickets to closed from the blocking graph, one ticket at a time.
 
 ## Language
 
-**Invocation**:
-The launcher and CLI that spawn a round. Sticky on the spec's chart.
-_Avoid_: agent, command line, runner, harness
+**Orchestrator**:
+The session that invoked `/implement-spec`. It stands in for the human running the ask-matt loop: it charts, spawns rounds, gates, and lands.
+_Avoid_: agent, driver, manager
 
-**Launcher**:
-Whether `va` wraps the CLI or the CLI runs bare.
-_Avoid_: harness, wrapper, agent
-
-**CLI**:
-The coding-agent binary that runs a round.
-_Avoid_: agent, harness, model, launcher
-
-**Permission mode**:
-How that CLI authorizes tool calls. A round uses the CLI's non-interactive permission mode; it is not a choice on the invocation.
-_Avoid_: yolo, bypass, auto (those are product names for one mode)
-
-**Agent**:
-The per-ticket process in a worktree that implements or reviews.
-_Avoid_: grok, claude, invocation, orchestrator
+**Subagent**:
+The harness's own fresh-context worker, whatever the harness calls it. Every round runs in one.
+_Avoid_: detached process, headless run, CLI process, invocation
 
 **Round**:
-One detached headless CLI process of the invocation in a ticket's worktree.
-_Avoid_: subagent
+One subagent run on a ticket's branch: an implementation, a review, an adjudication, or a correction.
+_Avoid_: process, session, task
+
+**Agent**:
+The subagent inside a round, as the party that implements, reviews, or adjudicates.
+_Avoid_: orchestrator, grok, claude, codex
+
+**Chart**:
+The orchestrator's record of one spec on disk: the tickets with their gate items, the suite, the probe, the traps, the standing rules, and the loop's `Now`.
+_Avoid_: plan, state file, scratchpad
+
+**Frontier**:
+The open `ready-for-agent` tickets whose blockers are all closed. The next ticket is the lowest-numbered one.
+_Avoid_: queue, backlog, batch
 
 **Blocker ledger**:
 The fixed approval bar from the initial review: authority, evidence, and closing outcome for each blocker, plus non-blocking suggestions.
@@ -39,7 +39,3 @@ _Avoid_: open review, fresh review
 **Correction verification**:
 A review against the blocker ledger and regressions introduced after its reviewed head.
 _Avoid_: fresh review, re-review
-
-**Orchestrator**:
-The session that invoked `/implement-spec`.
-_Avoid_: agent
