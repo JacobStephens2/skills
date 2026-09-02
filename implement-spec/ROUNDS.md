@@ -1,59 +1,41 @@
 # Rounds
 
-A **round** is one detached, headless CLI process of the **invocation** in a ticket's worktree. This file is the shell for it. The judgment stays in [`SKILL.md`](SKILL.md).
+A **round** is one subagent run on a ticket's branch. This file is the shell for it: how a round is spawned, pinned to its worktree, continued, and read. The judgment stays in [`SKILL.md`](SKILL.md).
 
-## How a round runs
+## Spawning
 
-Spawn the invocation: a detached headless CLI process, launched from inside the worktree. Bare `/implement-spec` inherits this session's CLI with launcher none; `use` names the invocation. In the worktree, the CLI discovers the project skills - `/implement`, `/code-review`, `/tdd` - so the prompt is a skill. Resume uses the invocation's continue so findings go back to the agent that has the context.
+Spawn a round with your harness's own subagent, in the background when it offers that, and read what it returns. Only the round's report reaches your context; the ledger is the only review text you hold. A subagent starts in your working directory, the primary checkout, not the worktree: every prompt pins the worktree by absolute path, and the round works, searches, and commits only under it. Record the round's subagent id in the chart's `Now` so you can continue it after a compaction.
 
-The scripts detach every round into a new session, so nothing in the orchestrator's tool timeouts can end it. A round appends to `worktrees/agent-logs/issue-<n>.log` and writes `<log>.exit` with the exit code when it ends. The `.exit` file is the completion signal a watch polls for. `.gitignore` lists `worktrees/`.
+Four kinds of round, each a prompt of a few facts:
 
-The implementer commits on the branch. It doesn't push, open a PR, or close the ticket unless the ticket includes those steps. Those are the orchestrator's.
+- **Implementation**: `Read <absolute path to implement/SKILL.md> and follow it for <ticket reference>. Work only in <absolute worktree path>, on its branch. Commit there; do not push, open a PR, or close the ticket. Append your report to <agent-logs>/issue-<n>.md.` The ticket is the brief.
+- **Review**: `In <absolute worktree path>, run /code-review <fixed-point>. The originating ticket is <ticket reference>: fetch it with the workflow in docs/agents/issue-tracker.md. Report only; edit nothing. Write the report to <agent-logs>/review-<n>.md.` The initial review's fixed point is the merge-base of the ticket branch and its land base. `/code-review` may fan out to its own sub-agents; only its summary returns to the round.
+- **Adjudication**: `Read <ticket reference> with its comments, the review at <agent-logs>/review-<n>.md, the diff in <absolute worktree path> since <merge-base>, and every test that diff adds. Judge each finding against the ticket's criteria, the spec traps and standing rules in <chart path>, and concrete correctness, security, data-loss, or external-side-effect failures. Write <agent-logs>/findings-<n>.md: first line reviewed-head: <full sha>; then each blocker with its authority, its evidence on that head, and the outcome that closes it; then suggestions, separately. Edit nothing else.`
+- **Correction verification**: the review prompt plus the ledger: `This is a correction verification against a fixed approval bar. Read the blocker ledger at <ledger path>. Verify each recorded blocker against current HEAD and report concrete regressions in the correction diff after <reviewed-head>. Keep pre-existing architectural alternatives and preferences as suggestions, not blockers.` Its fixed point is the ledger's `reviewed-head`.
+
+## Continuing
+
+A correction goes to the implementation round's own subagent: continue it with the ledger's path and `Close every blocker in the ledger; commit on the branch; do not push.` When your harness cannot continue a finished subagent, or the round predates this session, spawn a fresh implementation round on the branch with the ledger path in place of the skill path. A merge round is the same continue, with the prompt from [`MERGE-ROUND.md`](MERGE-ROUND.md).
 
 ## Scripts
 
-All of them take the primary checkout as their root, found from the skill's own location, so they run from anywhere. They read the default branch rather than assume it: `git symbolic-ref --short refs/remotes/origin/HEAD` names it. If that ref is unset, `git remote set-head origin -a` sets it from the remote.
+Run them by absolute path from this skill's `scripts/` folder. They find the primary checkout from your working directory and read the default branch from the remote rather than assume it.
 
-- `scripts/launch.sh [--dry-run] [--launcher <launcher>] [--cli <cli>] <issue> <worktree-name> [<ticket-ref>]`: refuses a dirty worktree, then runs `/implement <ticket-ref>` as the invocation. `<ticket-ref>` is the `/implement` argument (URL, number, or path). Default: the GitHub issue URL derived from `origin`. A pre-session Bitwarden 429 gets two bounded, jittered retries when the launcher is `va`; other exits are final.
-- `scripts/resume.sh [--dry-run] [--launcher <launcher>] [--cli <cli>] <issue> <worktree-name> <prompt-file>`: the invocation's continue with the file's text, such as review findings, a merge round, or a correction. A resume is a new round, so arm a new watch. The worktree is the session, so resume only when no suite and no round is already running in it.
-- `scripts/review.sh [--dry-run] [--launcher <launcher>] [--cli <cli>] <issue> <worktree-name> <fixed-point> [<blocker-ledger>]`: a fresh agent of the invocation runs `/code-review <fixed-point>` in the worktree, read-only, into `worktrees/agent-logs/review-<n>.log`. Without a ledger it is the initial review, and the fixed point is the merge-base of the ticket branch and its land base. With a ledger it verifies that fixed approval bar and the correction diff; the fixed point must equal the ledger's `reviewed-head`. Read from the `## Standards` heading.
-- `scripts/suite-capture.sh <worktree-name> <label> -- <command>...`: runs `<command>` in the worktree with its exit code into `worktrees/agent-logs/suite-gate-<label>.log` and the code into `<log>.exit`, the marker a chained wait polls for. `<command>` is the suite command from the chart.
-- `scripts/automerge.sh <worktree-name> [<base-ref>]`: for when the land base moved and the dry run is clean. It accepts `main` or `origin/main`, merges the remote base into a detached scratch worktree, `worktrees/<name>-merge`, at the branch tip, proves the tree equals what `git merge-tree` computes, and prints the commit hash. Exit 2 with the conflict list means a merge round. Capture the suite on `<name>-merge`, then `automerge.sh --adopt <worktree-name>` fast-forwards the branch worktree to it and removes the scratch.
-- `scripts/land.sh [--wait-checks] <issue> <worktree-name> <title> <body-file> [<base-ref>]`: GitHub. `--wait-checks` holds the merge until the PR's checks pass and stops without merging when one fails - use it from the first ticket that gives the repo CI onward, and always when a merge triggers a deploy. Accepts `main` or `origin/main` and refuses a dirty worktree or a land base not yet merged into the tip. It pushes and opens the PR from the worktree, merges it from the primary checkout, deletes the remote branch, fast-forwards the local land-base ref, and prints the hash of the merge commit and the state of the issue. Run it with `--dry-run` first to print the commands.
-- `scripts/watch.sh <issue>...`: prints `DONE issue-<n> exit=<code>` as each round's marker appears and exits when all have. Use it as a Monitor command. Pass `--review` to watch review logs instead. A disappearing `.exit` is a new round, so a resume on a still-armed watch prints `DONE` again. A first round on a large ticket runs past an hour, so re-arm a watch that has a one-hour limit, and give a resume its own.
+- `scripts/suite-capture.sh <worktree-name> <label> -- <command>...`: runs `<command>` in the worktree, logs it to `worktrees/agent-logs/suite-gate-<label>.log`, and prints the exit code and the log's tail. `<command>` is the suite command from the chart. Piping a suite through `tail` yourself reports the exit code of `tail` and hides the summary; the script is how you read a suite.
+- `scripts/land.sh [--dry-run] [--wait-checks] <issue> <worktree-name> <title> <body-file> [<base-ref>]`: GitHub. Pushes and opens the PR from the worktree, merges it from the primary checkout, deletes the remote branch, fast-forwards the local land-base ref, and prints the merge hash and the issue's state. Refuses a dirty worktree or a land base not yet merged into the tip; the second refusal means a merge round first. `--wait-checks` holds the merge until the PR's checks pass and stops without merging when one fails: use it from the first ticket that gives the repo CI onward, and always when a merge triggers a deploy. When the token cannot read PR checks, it reads the Actions runs for the tip instead. Run it with `--dry-run` first to print the commands.
 
-Memory bounds concurrency, and every other session on the box shares that memory. Read available memory before a batch (`/proc/meminfo` or `vm_stat`) and count live rounds by pid and worktree: a pid that launch, resume, or review printed that `kill -0` still accepts, in a worktree whose matching log has no `.exit`. After a restart, a worktree with a round log and no `.exit` is live if a process has that worktree as its cwd. Three or four agents plus their sub-agents fit beside a dozen resident sessions. Eleven don't.
-
-A silent log isn't a stalled round. The round writes only its own text, and a suite or a review sub-agent runs for 20 minutes without a line. Before you stop a quiet round, look for a test process whose working directory is the worktree. When you do stop a round, stop it by process ID with `kill <pid>`: a `pkill -f <pattern>` whose pattern matches the orchestrator's own Bash command ends that shell with exit code 144.
+When `land.sh` prints that it could not fast-forward the local land-base ref, from the primary: `git merge --ff-only origin/<base>`.
 
 ## Traps
 
-Each trap cost a round or a wrong reading once. They're grouped by the stage where each one hits.
+Each cost a round or a wrong reading once.
 
-### Launching and watching
-
-- The Bash tool's working directory persists across calls. A background command that uses a relative path, launched in the same response as a `cd` elsewhere, runs in the wrong worktree. A `review.sh` launched by a relative path from a shell left inside a worktree doesn't start at all, while its watch waits on a marker that never comes. Use absolute paths, always.
-- Review sub-agents share the session scratchpad and might write a file with your script's name. Name your files distinctively.
-- A chained wait polls for a marker its target actually writes: `suite-capture.sh` writes one, and a bare suite command doesn't. Arm a chain keyed on the round marker's absence while the marker is present. Armed after a resume already removed it, the chain reads the running round as the next one's launch, and a capture chained on the marker's return runs beside whatever round launches next in the same worktree. Read the round's process and the marker together before arming. Stop a chain rather than let two things share a worktree.
-
-### Reading a suite
-
-- Piping the suite through `tail` reports the exit code of `tail` and hides the summary. Redirect to a file, echo `$?`, and read the log. `suite-capture.sh` does exactly this.
-- Suites that name the same fixed port, simulator, emulator, or database in the chart run serially. Separate worktrees do not isolate process-level resources.
-- The implementer's "N tests OK" isn't the gate. The orchestrator's captured run is, after every resume too.
+- A subagent's search from the session's working directory finds the primary checkout's files, and an edit there lands outside the branch. Pin the worktree in every prompt; a report that names paths outside it is a round to redo.
+- Two rounds in one worktree at once corrupt both. A round runs to its report before the next spawns in that worktree, and the suite capture runs between rounds, not beside one.
+- A silent round isn't a stalled round. A suite or a review sub-agent runs for twenty minutes without a line. Read the worktree's git log before you stop anything.
+- The implementer's "N tests OK" isn't the gate. Your captured run is, after every correction too.
 - An install copied into a worktree, used as the interpreter without the repo's own test entrypoint, isn't that file. Run the charted command.
-
-### Gating
-
-- A spec's "production lacks X" sentence is a claim the Chart step probes on the base before the first launch. A mocked red proves only the mock.
-- The ticket's own new tests are where "a rule weakened to keep a test green" shows up first. Read each new test's filters against the criterion's words.
+- The ticket's own new tests are where "a rule weakened to keep a test green" shows up first. The adjudication round reads each new test's filters against the criterion's words.
 - Put the checks a spec repeats at every gate into one script at the first gate, and diff against the merge-base: `git diff origin/<default>..HEAD` counts turn false the moment the base moves.
-- A conflict-resolution script gates `git add` on its own success. A replacement that failed and a `git add` that ran anyway stages the conflict markers, and `rebase --continue` commits them.
-- Repeated merge rounds that each weaken the same check are one rule. Post it on the tickets, under `Settle rules once`, rather than send three branches back.
-
-### Merging and landing
-
-- Every sibling landing that still builds the old shape in a fixture breaks a ticket that changes that shape. The branch's suite is green, but the merged tree's suite is the gate. Grep the merged tree's tests for the old shape before landing.
-- Sibling specs on one land base move the default branch under you, and every move costs the next branch to land a suite run on the combined tree. Use `automerge.sh` for the clean case and a merge round for the rest, and merge only on a tip that has the land base as an ancestor. When several tickets edit one file, land in readiness order and draft the next merge prompts while you wait.
-- Merging a PR from the ticket worktree tries to delete the branch that worktree is on. From the primary checkout, it stops at "used by worktree" and leaves the remote branch too. `land.sh` merges from the primary checkout and deletes the remote branch itself.
-- `land.sh` cannot fast-forward the local land-base ref when that branch is checked out in the primary. After it prints that, from the primary: `git merge --ff-only origin/<base>`.
+- A conflict-resolution script gates `git add` on its own success. A replacement that failed and a `git add` that ran anyway stages the conflict markers, and the merge commits them.
+- Merging a PR from the ticket worktree tries to delete the branch that worktree is on and stops at "used by worktree". `land.sh` merges from the primary checkout for that reason.
