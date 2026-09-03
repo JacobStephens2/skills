@@ -31,6 +31,8 @@ When `land.sh` prints that it could not fast-forward the local land-base ref, fr
 Each cost a round or a wrong reading once.
 
 - A subagent's search from the session's working directory finds the primary checkout's files, and an edit there lands outside the branch. Pin the worktree in every prompt; a report that names paths outside it is a round to redo.
+- A test that hard-codes the primary checkout's absolute path loads two copies of one library from a worktree and dies on a redeclare, and skips itself on a CI runner that has no such path. Before the first round, run the suite **in the worktree**, not only in the primary checkout. If some tests cannot run there, exclude them by name in a gate script and have it **print how many it excluded**, so a run that covered less than the suite never reads like one that covered all of it. Then write your own tests with paths relative to the test file, the way the excluded ones should have been.
+- The ticket-fetch line in every round prompt is worth testing once yourself. A tracker CLI that renders for a terminal can print nothing at all when its output is redirected to a file, and a round that fetched an empty ticket implements the prompt instead.
 - Two rounds in one worktree at once corrupt both. A round runs to its report before the next spawns in that worktree, and the suite capture runs between rounds, not beside one.
 - A silent round isn't a stalled round. A suite or a review sub-agent runs for twenty minutes without a line. Read the worktree's git log before you stop anything.
 - The implementer's "N tests OK" isn't the gate. Your captured run is, after every correction too.
