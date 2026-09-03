@@ -1,0 +1,1 @@
+I have archived skills which I am no longer actively using or which have been superceded by other skills, especially skills from Matt Pocock's skill repo: https://github.com/mattpocock/skills
