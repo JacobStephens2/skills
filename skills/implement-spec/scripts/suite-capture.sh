@@ -13,7 +13,7 @@ WT="$ROOT/worktrees/$WTN"
 L="$ROOT/worktrees/agent-logs/suite-gate-$LABEL.log"; mkdir -p "$(dirname "$L")"
 echo "# suite $WTN at $(git -C "$WT" rev-parse --short HEAD) started $(date -u +%FT%TZ)" > "$L"
 echo "# cmd: $*" >> "$L"
-(cd "$WT" && "$@") >> "$L" 2>&1; rc=$?
+(cd "$WT" && bash -c "$*") >> "$L" 2>&1; rc=$?
 echo "suite $WTN ($(git -C "$WT" rev-parse --short HEAD)) exit=$rc log=$L"
 tail -20 "$L"
 exit "$rc"

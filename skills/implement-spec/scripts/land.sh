@@ -65,14 +65,15 @@ wait_for_runs() {
   echo "Actions runs for ${sha:0:7} did not complete; not merging" >&2; return 1
 }
 
-DEFAULT=$(git -C "$ROOT" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || { git -C "$ROOT" remote set-head origin -a >/dev/null 2>&1; git -C "$ROOT" symbolic-ref --short refs/remotes/origin/HEAD; }); DEFAULT=${DEFAULT#origin/}
+DEFAULT=$(git -C "$ROOT" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || { git -C "$ROOT" remote set-head origin -a >/dev/null 2>&1; git -C "$ROOT" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null; }); DEFAULT=${DEFAULT#origin/}
+DEFAULT=${DEFAULT:-main}
 BASE=${5:-$DEFAULT}; BASE=${BASE#origin/}
 git -C "$ROOT" fetch -q origin
 BR=$(git -C "$WT" branch --show-current); H=$(git -C "$WT" rev-parse HEAD); B=$(git -C "$ROOT" rev-parse "origin/$BASE")
 [ -n "$BR" ] || { echo "$WT is not on a branch" >&2; exit 1; }
 [ -z "$(git -C "$WT" status --porcelain)" ] || { echo "$WT is not clean; refusing" >&2; exit 1; }
 git -C "$ROOT" merge-base --is-ancestor "$B" "$H" || { echo "origin/$BASE (${B:0:7}) is not merged into ${H:0:7}; run a merge round first" >&2; exit 1; }
-head -1 "$BODY" | grep -qE "^Closes #$ISSUE\.?$" || echo "note: body's first line is not 'Closes #$ISSUE'" >&2
+head -1 "$BODY" | grep -qiE "^(closes|fixes|resolves) #$ISSUE\.?$" || echo "note: body's first line is not 'Closes #$ISSUE'" >&2
 if [ "$DRY" = 1 ]; then
   echo "would: git -C $WT push -u origin $BR"; echo "would: gh pr create --base $BASE --head $BR --title '$TITLE' --body-file $BODY (from $WT)"
   [ "$WAIT" = 1 ] && echo "would: wait for the PR's checks, or the Actions runs for ${H:0:7} when the token cannot read checks"

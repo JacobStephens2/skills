@@ -89,6 +89,20 @@ if [ "$rc" -eq 0 ] && grep -q '^merged: origin/main' <<<"$out" && grep -q '^pr c
   pass "readable PR checks are watched and the Actions API is not called"
 else fail "checks ok: rc=$rc out: $out gh: $(cat "$GHLOG")"; fi
 
+printf 'fixes #4\n\nbody\n' > "$BODY"
+out=$(cd "$WT" && "$SRC/land.sh" --dry-run 4 wt "Title" "$BODY" 2>&1)
+if ! grep -q 'note: body' <<<"$out"; then
+  pass "case-insensitive fixes keyword is accepted with no warning"
+else fail "fixes keyword emitted warning: $out"; fi
+
+# Test fallback when origin/HEAD is unset
+git -C "$PRIMARY" remote set-head origin --delete 2>/dev/null || rm -f "$ORIGIN/HEAD" "$PRIMARY/.git/refs/remotes/origin/HEAD"
+git -C "$WT" merge -q --no-edit origin/main
+out=$(cd "$WT" && "$SRC/land.sh" --dry-run 4 wt "Title" "$BODY" 2>&1)
+if grep -q '^would: gh pr create --base main' <<<"$out"; then
+  pass "fallback to main base succeeds when origin/HEAD is unset"
+else fail "missing origin/HEAD fallback: $out"; fi
+
 echo
 echo "$PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
