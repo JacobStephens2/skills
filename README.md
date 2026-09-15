@@ -5,17 +5,16 @@ compatible with OpenAI Codex, Claude Code, and other agents that follow the conv
 Each skill is a directory containing a `SKILL.md` (instructions plus `name`/`description`
 frontmatter) and optional agent-specific metadata under `agents/`.
 
-The **source** of a skill this repo maintains is the directory at the repo root
-(`implement-spec/`, `plan/`, …). Edit those folders. `.agents/skills/` is what this
-repo *uses*: vendor skills are real directories locked in `skills-lock.json`;
-skills maintained here are symlinks back to the root folder, so `/implement-spec`
-(and the others) run against the source in this checkout.
+The **source** for `granola-transcripts` lives in `skills/granola-transcripts/`.
+`.agents/skills/` contains the skills this repo *uses*: vendor skills are real
+directories locked in `skills-lock.json`; maintained skills use symlinks to
+their source directories. Edit the source rather than making a separate copy.
 
 ## Skills
 
 | Skill | Purpose |
 |---|---|
-| [`granola-transcripts`](granola-transcripts/) | Retrieve Granola meeting transcripts through the API with timestamps and source attribution. |
+| [`granola-transcripts`](skills/granola-transcripts/) | Retrieve Granola meeting transcripts through the API with timestamps and source attribution. |
 | [`plan`](plan/) | Produce a rigorous, implementation-ready plan for building an application. |
 | [`review`](review/) | Adversarial review of a plan: ranked findings and a verdict. |
 | [`adjudicate-review`](adjudicate-review/) | Adjudicate adversarial-review findings and revise the plan. |
