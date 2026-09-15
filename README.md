@@ -1,58 +1,43 @@
 # skills
 
-Reusable agent skills in the [SKILL.md](https://developers.openai.com/codex/skills) format,
-compatible with OpenAI Codex, Claude Code, and other agents that follow the convention.
-Each skill is a directory containing a `SKILL.md` (instructions plus `name`/`description`
-frontmatter) and optional agent-specific metadata under `agents/`.
+Reusable agent skills in the [SKILL.md](https://developers.openai.com/codex/skills)
+format, compatible with OpenAI Codex, Claude Code, and other agents that follow
+that convention.
 
-The **source** for `granola-transcripts` lives in `skills/granola-transcripts/`.
-`.agents/skills/` contains the skills this repo *uses*: vendor skills are real
-directories locked in `skills-lock.json`; maintained skills use symlinks to
-their source directories. Edit the source rather than making a separate copy.
+Skill source lives under `skills/`. Each skill contains a `SKILL.md` with its
+name, description, and instructions, plus any supporting scripts or references.
+`.agents/skills/` contains skills used while working on this repository;
+`skills-lock.json` records vendored dependencies.
 
 ## Skills
 
 | Skill | Purpose |
-|---|---|
+| --- | --- |
 | [`granola-transcripts`](skills/granola-transcripts/) | Retrieve Granola meeting transcripts through the API with timestamps and source attribution. |
-| [`plan`](plan/) | Produce a rigorous, implementation-ready plan for building an application. |
-| [`review`](review/) | Adversarial review of a plan: ranked findings and a verdict. |
-| [`adjudicate-review`](adjudicate-review/) | Adjudicate adversarial-review findings and revise the plan. |
-| [`stephens-blog-post`](stephens-blog-post/) | Write and ship interactive, teaching-first posts for [stephens.page/blog](https://stephens.page/blog/) (house template, voice, real live figures, `agents.md`, verification, deploy). |
-| [`domain-modeling`](domain-modeling/) | Build and sharpen a project's domain model (glossary, ADRs). |
-| [`grilling`](grilling/) / [`grill-me`](grill-me/) / [`grill-with-docs`](grill-with-docs/) | Relentless interview to stress-test a plan or design. |
-| [`chisel`](chisel/) | Simplify and cut fat while keeping required meaning. |
-| [`implement-spec`](implement-spec/) | Drive a spec's tickets to closed one at a time: a subagent round per ticket in its own worktree, gated, then landed from the blocking graph. |
-| [`root-cause-analysis`](root-cause-analysis/) | Write a root-cause analysis. |
-
-Planning skills chain: draft with `plan`, attack with `review`, settle with
-`adjudicate-review`.
-
-For an overnight `implement-spec` run, start the orchestrator in its non-interactive permission mode with an
-auto-compact window near 150k tokens; in Claude Code that is `claude --dangerously-skip-permissions --autocompact 150000`.
-The skill keeps its state in the spec's chart on disk, so a compacted or restarted session picks up where it stopped.
+| [`implement-spec`](skills/implement-spec/) | Complete a specification's tickets in dependency order, using a subagent round per ticket with verification before landing. |
 
 ## Install
 
-### Codex CLI
+### Codex
 
-Symlink (or copy) the skill folders into `~/.codex/skills/`:
+Clone the repository and link its skill directories into your personal skills
+folder:
 
 ```bash
 git clone https://github.com/JacobStephens2/skills.git
+cd skills
 mkdir -p ~/.codex/skills
-for d in skills/*/; do ln -s "$(pwd)/${d%/}" ~/.codex/skills/"$(basename "$d")"; done
+for skill in "$PWD"/skills/*/; do
+  [ -f "${skill}SKILL.md" ] || continue
+  ln -s "${skill%/}" "$HOME/.codex/skills/$(basename "$skill")"
+done
 ```
 
-Restart Codex, then invoke a skill with `$plan-application` (or let it auto-activate when a
-request matches its description). You can also install a single skill from this repo inside
-Codex with the skill installer:
-
-```
-$skill-installer JacobStephens2/skills/plan-application
-```
+Invoke a skill by name, for example `$granola-transcripts` or `$implement-spec`.
+Granola transcript retrieval uses `GRANOLA_API_KEY` from the environment.
 
 ### Claude Code
 
-Same layout, different directory — symlink into `~/.claude/skills/` (personal) or
-`.claude/skills/` (project), then invoke with `/plan-application`.
+Link the same source directories into `~/.claude/skills/` for personal use or
+`.claude/skills/` within another project. Invoke them as `/granola-transcripts`
+or `/implement-spec`.
