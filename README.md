@@ -15,6 +15,7 @@ skills maintained here are symlinks back to the root folder, so `/implement-spec
 
 | Skill | Purpose |
 |---|---|
+| [`granola-transcripts`](granola-transcripts/) | Retrieve Granola meeting transcripts through the API with timestamps and source attribution. |
 | [`plan`](plan/) | Produce a rigorous, implementation-ready plan for building an application. |
 | [`review`](review/) | Adversarial review of a plan: ranked findings and a verdict. |
 | [`adjudicate-review`](adjudicate-review/) | Adjudicate adversarial-review findings and revise the plan. |
