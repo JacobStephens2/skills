@@ -1,56 +1,43 @@
 # Spec chart
 
-Copy this file to `worktrees/agent-logs/spec-<id>-chart.md` and fill every slot. `<id>` is the spec issue number, or the file stem for a local spec.
+Copy to `worktrees/agent-logs/spec-<id>-chart.md`. Keep `Now` current; append past
+evidence below it rather than leaving superseded holds as the current state.
 
 ## Now
 
-- **Ticket:** the next ticket, or the one in flight
-- **Round:** none / implementation / review / adjudication / correction / verification, with the subagent id when the harness gives one
-- **State:** cutting / running / gating / landing / held
-- **Last landing:** merge sha and ticket
+- **Ticket, phase and agent:**
+- **Worktree, branch and candidate SHA:**
+- **State / exact next action or hold:**
+- **Last landing / PR:**
 
-## Implement skill
+## Workflow
 
-Absolute path of `implement/SKILL.md`. A round reads it by path.
+- **Tracker and blocking edges:**
+- **Implement and review skill paths:**
+- **Land bases, merge authority, required reviews/checks:**
+- **Landing convention and post-merge checks:**
+- **Permitted test environment / shared resources:**
+- **Standing repository rules:**
 
 ## Tickets
 
-| Ticket | Title | Blockers | Label | Worktree | Land base | Gate items (this ticket's) |
-|---|---|---|---|---|---|---|
-| | | | | `worktrees/issue-<n>-<slug>` | | |
+| Ticket | Blockers / status | Worktree / land base | Required evidence / remaining phase |
+| --- | --- | --- | --- |
+| | | | |
 
-Frontier: the open `ready-for-agent` tickets whose blockers are closed. Next: the lowest-numbered.
+Frontier and next ticket:
 
-## Landing convention
+## Verification
 
-Title voice, close-on-merge first line, merge commit, remote branch deleted. `--wait-checks` only if this repo has CI or a merge deploys.
+- **Suite and extra gate commands:**
+- **Dependencies and ignored configuration:**
+- **Baseline SHA, counts, failures, skips and exclusions:**
+- **Coverage for excluded checks:**
+- **Claims and named paths checked against the base:**
+- **Acceptance evidence not established by tests:**
 
-## Suite
+## Evidence and holds
 
-- **Command:**
-- **Install:** (none / `.venv` / `node_modules` / ignored config a checkout does not carry)
-- **Baseline on the land base:** the counts, and each failure by name
-- **What the command cannot see:** tests excluded to make it run, and where they are covered instead
-- **Extra gate:**
-
-If the environment has no suite, write that, capture the last landing's check or `true`, and name which ticket adds the suite. If the suite is red on the land base, that baseline is the gate: a branch matches it, and the failures in it are nobody's ticket to fix.
-
-## Probe
-
-| Claim or figure | Command | Result |
-|---|---|---|
-| | | Holds / spec finding |
-
-For each figure that counts rows matching a predicate, also record what each value in that predicate **means**, and the code that writes it. A right number under a wrong word is the failure this table exists to catch.
-
-## Spec traps (green suite does not prove)
-
--
-
-## Paths vs land base
-
-`git cat-file -e <base>:<path>` for every path a ticket names. Missing paths are untracked drafts; the ticket lands without them.
-
-## Standing rules
-
-1.
+Record the candidate SHA, environment, command or observed action, result, and
+limits for each gate. Link the fixed blocker ledger. For rollout, record the
+phases from ROLLOUT.md here, including temporary changes and their restoration.
