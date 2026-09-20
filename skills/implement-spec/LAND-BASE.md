@@ -1,19 +1,25 @@
-# Land base
+# Integration branches
 
-Reached when a ticket's **land base** is not the default branch: it names an integration branch, or says it is not merged independently to the default. The chart already wrote that base. This file is how landing works on it.
+Use this when the requested workflow lands tickets on an integration branch.
+Check its rules and the final destination's rules during charting. Protection
+alone does not authorize routing around review through a new branch.
 
-## Open the ref
+Reuse the named integration ref, or create the agreed ref from the default
+branch. Cut ticket worktrees from its latest tip and target ticket PRs there.
+Delete individual ticket branches after landing; retain the shared integration
+branch until its release is complete.
 
-Cut the integration ref from the default branch's tip and push it. Worktrees for tickets that land there start on that ref, not on `origin/<default>`. PRs use `--base` that ref.
+A merge to an integration branch does not trigger GitHub's default-branch issue
+closure. Close completed implementation tickets explicitly when the agreed
+workflow uses that milestone. Keep release tickets open for their own acceptance
+criteria; use reference-only PR bodies while required rollout is outstanding.
 
-Close-on-merge in a PR body fires only when the merge is to the default branch. After merging to the integration ref, close the issue by hand and say so in the close comment.
+Before the staging-to-default release PR, merge the current destination branch
+into the candidate, preserve its changes, and gate the combined tree. The PR must
+carry that tested tree. If an approving review is required, prepare the complete
+PR and request the review; neither staging nor green CI waives that requirement.
 
-The last ticket whose land base *is* the default branch merges `origin/<default>` first - a merge round - so a sibling that landed on the default while the spec ran is in the tree. Gate that merge. Then open the PR to the default branch. Done when `git log origin/<default>..` on that branch names only the cutover and the merge of what the default gained.
-
-## Fast-forward
-
-After a merge, fetch and fast-forward the **land-base** ref (and any worktree that holds it). The shared checkout of the default branch moves only when a ticket actually landed there.
-
-## Post-merge gates
-
-A merge to an integration ref is not a merge to the default branch. CI and any post-merge gate that watches the default branch will not run for it. Watch those gates only after a merge to the default.
+After each merge, fetch and fast-forward the checkout that holds the land base.
+Watch the post-merge checks configured for that branch: integration branches can
+have their own CI. After the release merge, follow ROLLOUT.md when actual
+deployment or activation is part of the ticket.
