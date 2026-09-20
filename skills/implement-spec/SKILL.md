@@ -22,10 +22,11 @@ If a chart exists, go to Restart. Otherwise:
    edges with the written dependencies. Identify each ticket's **land base** from
    the requested branch workflow; default to the repository's default branch.
    Read [`LAND-BASE.md`](LAND-BASE.md) when using an integration branch.
-2. Check tracker access, branch protection, required reviews/checks, and merge
-   authority now. Record any human step. A protected branch is a handoff, not
-   permission to change the workflow or bypass its rules. Fetch the land base and
-   fast-forward its clean checkout, preserving unrelated work.
+2. Check tracker access and credentials, branch protection, required
+   reviews/checks, and merge authority now. Record any human step. A protected
+   branch is a handoff, not permission to change the workflow or bypass its
+   rules. Fetch the land base and fast-forward its clean checkout, preserving
+   unrelated work.
 3. Read repository instructions and environment policy. Locate `/implement` and
    `/code-review` by absolute path. Record coding standards, landing convention,
    suite commands, dependencies, configuration and post-merge checks.
@@ -46,8 +47,10 @@ on the open tickets so their implementers and reviewers see them.
 ## Implement
 
 1. Fetch the next ticket's land base. Cut `worktrees/issue-<id>-<slug>` from its tip
-   and exclude local worktrees from Git. Prepare matching dependencies and safe
-   ignored configuration; a worktree does not isolate databases or providers.
+   and exclude local worktrees from Git, including shared virtualenv or dependency
+   symlinks in `.git/info/exclude` so landing sees a clean tree. Prepare matching
+   dependencies and safe ignored configuration; a worktree does not isolate
+   databases or providers.
 2. Capture the baseline with `scripts/suite-capture.sh`. Resolve unexpected
    differences before attributing them to the ticket. A known baseline failure
    is not permission to skip a required acceptance check.
