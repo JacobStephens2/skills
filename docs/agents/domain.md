@@ -4,8 +4,8 @@ How the engineering skills should consume this repo's domain documentation when 
 
 ## Before exploring, read these
 
-- **`implement-spec/CONTEXT.md`** when the work is that skill.
-- **`implement-spec/docs/adr/`** for decisions in that skill, when the directory exists.
+- **`skills/<name>/CONTEXT.md`** when the work is that skill.
+- **`skills/<name>/docs/adr/`** for decisions in that skill.
 - **`CONTEXT-MAP.md`** at the repo root if it exists later: it would point at one `CONTEXT.md` per skill.
 
 If a listed file doesn't exist, **proceed silently**. Don't flag its absence; don't suggest creating it upfront. `/domain-modeling` (via `/grill-with-docs`) creates files lazily when terms or decisions resolve.
@@ -14,18 +14,18 @@ There is no root `CONTEXT.md`. Do not invent one.
 
 ## File structure
 
-This repo is a kit of skills. Today one skill has a glossary:
+This repo is a kit of skills. No active skill has a glossary today; one would sit beside its `SKILL.md`:
 
 ```
 /
-├── implement-spec/
+├── skills/<name>/
 │   ├── CONTEXT.md
 │   └── docs/adr/          ← create lazily with the first ADR
 └── docs/
     └── agents/            ← this file
 ```
 
-A root `CONTEXT-MAP.md` is added only when a second skill gets a glossary.
+A root `CONTEXT-MAP.md` is added only when a second skill gets a glossary. Archived skills under `skills/.archive/` keep theirs but are not worked on.
 
 ## Use the glossary's vocabulary
 

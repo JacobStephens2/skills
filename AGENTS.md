@@ -10,4 +10,4 @@ Canonical role names as labels: `needs-triage`, `needs-info`, `ready-for-agent`,
 
 ### Domain docs
 
-No root glossary. `implement-spec` has `implement-spec/CONTEXT.md` and ADRs under `implement-spec/docs/adr/`. Elsewhere, proceed silently. See `docs/agents/domain.md`.
+No glossaries yet; proceed silently. See `docs/agents/domain.md`.
