@@ -2,7 +2,7 @@
 
 ## Research to reuse
 
-Five cited notes in [`research/`](research/), each ending in checkable rules:
+Six cited notes in [`research/`](research/), each ending in checkable rules:
 
 - [`clarity.md`](research/clarity.md):
   - narration at 160–185 wpm, spoken rather than printed as a script;
@@ -13,6 +13,7 @@ Five cited notes in [`research/`](research/), each ending in checkable rules:
   - captions as a toggleable track.
 - [`music.md`](research/music.md): music only where there's no narration, or as a bed at least 20 dB below the voice; −16 LUFS, true peak −1 dBTP; ElevenLabs music terms.
 - [`audiences.md`](research/audiences.md): executive cuts versus engineer cuts. Executive cuts give the answer first, cite no speed numbers, speak one limit, end on a low-commitment call to action and keep claims FTC-safe.
+- [`nontech-executives.md`](research/nontech-executives.md): non-technical leaders. Lead with who decides what ships, pre-teach at most three terms, choose analogies that map relations rather than a worker's character, and promise no financial benefit.
 - [`marketing.md`](research/marketing.md): sound-off feeds with burned-in text, about 25 s, in 16:9 plus 4:5. YouTube files a square-or-taller video under 3 min as a Short.
 - [`tutorial.md`](research/tutorial.md): procedural video. Preview the end state, put chapters on sub-goals, show **real output** and end each chapter on a still output frame.
 
