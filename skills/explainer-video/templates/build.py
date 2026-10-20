@@ -83,7 +83,7 @@ open("final/index.html", "w").write("""<!doctype html><html lang="en"><head><met
 <style>body{margin:0;background:#0F1115;display:grid;place-items:center;min-height:100vh}
 video{width:min(100vw,1600px);max-height:100vh;background:#000}</style></head><body>
 <video controls preload="metadata" poster="poster.jpg" src="explainer.mp4">
-  <track kind="captions" srclang="en" label="English" src="explainer.vtt" default>
+  <track kind="captions" srclang="en" label="English" src="explainer.vtt">
 </video></body></html>
 """)
 print(f"final/explainer.mp4 {total:.2f}s; captions {sum(1 for l in vtt if '-->' in l)} cues")
