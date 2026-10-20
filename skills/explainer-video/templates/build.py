@@ -4,12 +4,18 @@ Writes final/explainer.mp4 (narration; music only in the unnarrated head and tai
 final/explainer.vtt (captions from the narration's word timings), and final/index.html
 (a <video controls> player with the captions as a toggleable track).
 """
-import json, os, subprocess
+import json, os, re, subprocess
 
 here = os.path.dirname(os.path.abspath(__file__))
 os.chdir(here)
 plan = json.load(open("plan.json"))
 music = os.path.join(here, "music.wav")  # from music.py
+
+# The narration spells numbers and initialisms for the voice; captions show the written form.
+# Each pair is applied to every caption's text, e.g. ("T D D", "TDD"), ("seven ninety-four", "#794").
+CAPTION_FIXES = []
+# Spoken phrases whose full stop is not a sentence end, so no caption breaks inside them, e.g. "a.m. Eastern".
+NO_BREAK = []
 
 def run(*args):
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", *args], check=True)
@@ -57,15 +63,20 @@ for p in plan:
     a = json.load(open(f"voice/{p['scene']}.json"))["alignment"]
     chars, starts, ends = a["characters"], a["character_start_times_seconds"], a["character_end_times_seconds"]
     off = p["start"] + p["lead"]
+    spoken = "".join(chars)
+    keep = {m.start() + j for phrase in NO_BREAK for m in re.finditer(re.escape(phrase), spoken)
+            for j, ch in enumerate(phrase[:-1]) if ch in ".?!"}
     buf, b0 = "", None
     for i, c in enumerate(chars):
         if b0 is None and not c.isspace():
             b0 = starts[i]
         buf += c
-        stop = c in ".?!" and (i + 1 == len(chars) or chars[i + 1].isspace())
+        stop = c in ".?!" and i not in keep and (i + 1 == len(chars) or chars[i + 1].isspace())
         soft = c in ",:" and len(buf.strip()) > 84 - 30 and (i + 1 == len(chars) or chars[i + 1].isspace())
         if stop or soft or i + 1 == len(chars):
             text = buf.strip()
+            for spoken_form, written in CAPTION_FIXES:
+                text = text.replace(spoken_form, written)
             if text:
                 words, lines, line = text.split(), [], ""
                 for w in words:  # wrap to two lines of at most ~42 characters
