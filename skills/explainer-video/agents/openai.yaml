@@ -1,0 +1,3 @@
+interface:
+  display_name: "Explainer video"
+  short_description: "Make narrated, word-synced explainer videos from HTML scenes rendered to MP4"
