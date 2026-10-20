@@ -1,12 +1,12 @@
-# How to make the "How to use thirdshift" getting-started tutorial video
+# How to make a getting-started tutorial video for a CLI
 
-Research date: 2026-10-19.
+Research date: 2026-10-19. Researched for the [thirdshift](https://github.com/JacobStephens2/thirdshift) explainer videos, then generalised. thirdshift's command-by-command half stays in its [`explainer-video-tutorial.md`](https://github.com/JacobStephens2/thirdshift/blob/main/docs/research/explainer-video-tutorial.md), a worked example of §5.
 
-**Question.** How should a getting-started tutorial video for the thirdshift CLI be made, and what exactly should it show, command by command, with the output a viewer should expect at each step?
+**Question.** How should a getting-started tutorial video for a developer CLI be made?
 
-**Method.** Part 1 cites primary literature (DOIs resolved against Crossref on title, authors, journal, pages) and standards text. **[FT]** = quoted from a paper read in full; **[AB]** = publisher abstract; **[SN]** = search snippet, unverified. **[DEL]** = obtained by a delegated standards pass with the provenance shown, not fetched in this session. Part 2 cites this repo with `file:line` — `README.md`, `docs/guide.md`, `site/index.html`, and `src/` only to confirm a command or flag exists.
+**Method.** It cites primary literature (DOIs resolved against Crossref on title, authors, journal, pages) and standards text. **[FT]** = quoted from a paper read in full; **[AB]** = publisher abstract; **[SN]** = search snippet, unverified. **[DEL]** = obtained by a delegated standards pass with the provenance shown, not fetched in this session. thirdshift's command-by-command half cited its own repo with `file:line`.
 
-**Out of scope.** The narrated 60–120 s *explainer*: `explainer-video-clarity.md` (Mayer's magnitudes, 160–185 wpm, captions, WCAG, diagrams) and `explainer-newcomer-concepts.md` (terms to pre-teach, six confirmed misconceptions) are taken as read and never repeated. Also out: audience segmentation, music, render tooling, hosting, localisation.
+**Out of scope.** The narrated 60–120 s *explainer*: [clarity.md](clarity.md) (Mayer's magnitudes, 160–185 wpm, captions, WCAG, diagrams) and the product's newcomer-concepts note (terms to pre-teach, misconceptions) are taken as read and never repeated. Also out: audience segmentation, music, render tooling, hosting, localisation.
 
 ## TL;DR
 
@@ -16,8 +16,8 @@ Research date: 2026-10-19.
 - **Typing speed and demonstration pacing are unevidenced.** No primary source. Any choice is a design judgement.
 - **No standards body fixes a minimum text height for arbitrary on-screen text.** Every figure that exists governs subtitles. Safe-area geometry transfers; character height does not.
 - Show the failure and the recovery, with an honest warrant: error management training gives *d* = 0.44 over 24 studies, *d* = 0.80 on adaptive transfer **[FT]** — for learners making their *own* errors, not for watching a demonstrator fail. Flagged extrapolation.
-- **Record a real terminal, rehearsed.** No primary source compares real with rendered (flagged); the deciding argument is that the project already publishes real stderr as proof (`site/index.html:316`).
-- The repo has a complete real transcript of a *successful* Run and **nothing** for `status`, `show`, `logs`, `setup`, `update` or the installer (§5.9).
+- **Record a real terminal, rehearsed.** No primary source compares real with rendered (flagged); the deciding argument is that a project which publishes real output as proof undercuts itself with a synthetic terminal (§2).
+- Docs rarely show the output of every command. List the beats whose output is undocumented, and record them live or drop them (§5).
 
 ## 1. Tutorial practice for software tasks
 
@@ -29,7 +29,7 @@ Results **[FT]**: "the video instructions yielded more favorable appraisals for 
 
 DOI-verified but unread: the paper-vs-video comparison ([10.1016/j.compedu.2014.06.003](https://doi.org/10.1016/j.compedu.2014.06.003)) — **its between-condition result is not stated here, because the snippets contradicted each other**; the DBT framing ([10.1007/s11251-016-9394-9](https://doi.org/10.1007/s11251-016-9394-9)), anchored on Rosen et al. 2010 ([10.1177/0018720810381071](https://doi.org/10.1177/0018720810381071) — the circulated `…0810669458` does not resolve); and the successor, **van der Meij & Hopfner (2022), "Eleven guidelines…", *Technical Communication* 69(3), 5–23 ([10.55177/tc786532](https://doi.org/10.55177/tc786532))**, adding procedural discourse, video reviews, music and narrator presence. **Read the eleven before cutting; they supersede the eight.**
 
-**Worked examples.** Sweller & Cooper (1985) ([10.1207/s1532690xci0201_3](https://doi.org/10.1207/s1532690xci0201_3)) is foundational but **unread, no verified effect size** — the quoted "six times longer" is **[SN]** and not reproduced. Review: Renkl (2014) ([10.1111/cogs.12086](https://doi.org/10.1111/cogs.12086)). The only meta-analysis found, Barbieri et al. (2023) ([10.1007/s10648-023-09745-1](https://doi.org/10.1007/s10648-023-09745-1)), gives g ≈ 0.48 **[SN, unverified]** and is **mathematics-only**; **no worked-example meta-analysis exists for software or procedural training**. The caveat is solid — Kalyuga et al. (2003) ([10.1207/S15326985EP3801_4](https://doi.org/10.1207/S15326985EP3801_4)): what helps novices loses value for experts. The audience is terminal-expert and thirdshift-novice, so demonstrate thirdshift's decisions, not git, `gh` or cron.
+**Worked examples.** Sweller & Cooper (1985) ([10.1207/s1532690xci0201_3](https://doi.org/10.1207/s1532690xci0201_3)) is foundational but **unread, no verified effect size** — the quoted "six times longer" is **[SN]** and not reproduced. Review: Renkl (2014) ([10.1111/cogs.12086](https://doi.org/10.1111/cogs.12086)). The only meta-analysis found, Barbieri et al. (2023) ([10.1007/s10648-023-09745-1](https://doi.org/10.1007/s10648-023-09745-1)), gives g ≈ 0.48 **[SN, unverified]** and is **mathematics-only**; **no worked-example meta-analysis exists for software or procedural training**. The caveat is solid — Kalyuga et al. (2003) ([10.1207/S15326985EP3801_4](https://doi.org/10.1207/S15326985EP3801_4)): what helps novices loses value for experts. The audience is terminal-expert and product-novice, so demonstrate the product's decisions, not the git, `gh` or cron around it.
 
 **The failure case.** Keith & Frese (2008), *Journal of Applied Psychology* 93(1), 59–69 ([10.1037/0021-9010.93.1.59](https://doi.org/10.1037/0021-9010.93.1.59)), author PDF read in full **[FT]**: "the mean effect of EMT across all identified 24 studies (N = 2183) was positive and significant (Cohen's *d* = 0.44)"; "effect sizes to be larger for posttraining transfer than for within-training performance (transfer performance: *d* = 0.56) and for performance tasks that were structurally distinct (adaptive transfer) rather than similar (analogical transfer) to training tasks (adaptive transfer: *d* = 0.80)"; analogical transfer alone "*d* = 0.20, *p* < .05". **Flagged extrapolation:** EMT is the *learner* exploring and erring, not a viewer watching a demonstrator fail. The failure chapter borrows EMT's direction, not its *d*.
 
@@ -49,117 +49,39 @@ The nearest figures, both *for subtitles* **[DEL]**: the BBC Subtitle Guidelines
 
 **Pacing and typing speed.** **No primary research exists** on either. The only citable material is normative, G3.1, p. 212 **[FT]**: "employ a conversational tempo and not to speak instructions too quickly… Designers occasionally also affect the pace by extending natural breaks with an additional two to five seconds pause", and "A slow demonstration can be boring… A fast demonstration can overload the user". The two-to-five seconds is what designers *occasionally do*, not a tested value.
 
-**Verdict: real terminal, rehearsed.** Three repo-specific reasons. The project publishes real stderr as evidence and says so (`site/index.html:105`, `:316`), so a synthetic terminal would undercut its own standard of proof. A Run "takes minutes to tens of minutes" (`docs/guide.md:288`), so a real recording must be cut anyway — the only thing rendering would have bought. And the lines are fixed strings (`docs/guide.md:336`), so rendering buys nothing but fabrication risk. Cut waits with a visible time jump; never re-type a line that differs from what the binary prints.
+**Verdict: real terminal, rehearsed.** Three reasons, from the thirdshift case but general to CLIs. If the project publishes real output as evidence, a synthetic terminal undercuts its own standard of proof. A long-running command must be cut anyway, which is the only thing rendering would have bought. And when the output lines are fixed strings, rendering buys nothing but fabrication risk. Cut waits with a visible time jump; never re-type a line that differs from what the binary prints.
 
 ## 3. Length and chapters
 
-**Chapters are for re-use, not learning.** Ploetzner (2022), *Interactive Learning Environments* ([10.1080/10494820.2022.2123002](https://doi.org/10.1080/10494820.2022.2123002)) **[AB]**: "Videos that include enhanced interaction features are significantly more effective than videos that comprise merely navigational interaction features or no interaction features… an overall effect size of Hedges's g = 0.522… However, if a video is not paused while an enhanced interaction feature is offered to the learners, a split-attention effect occurs, and learning is impeded." Chapters, timestamps and a scrub bar are *navigational* — the losing baseline. **No primary research establishes a benefit for chapters or timestamps.** Mayer's segmenting is system-paced, and its *d* = 0.79 came from click-to-continue (clarity file §1), so a linear video inherits neither. Chapter it anyway, because a tutorial is consulted mid-task and the returning viewer needs §5.7 in one click; `<track kind="chapters">` is a standard `<track>` kind ([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track)). Merkt et al. (2011), *Learning and Instruction* ([10.1016/j.learninstruc.2011.03.004](https://doi.org/10.1016/j.learninstruc.2011.03.004)) is DOI-verified but **unread, volume and pages unconfirmed** — not relied on.
+**Chapters are for re-use, not learning.** Ploetzner (2022), *Interactive Learning Environments* ([10.1080/10494820.2022.2123002](https://doi.org/10.1080/10494820.2022.2123002)) **[AB]**: "Videos that include enhanced interaction features are significantly more effective than videos that comprise merely navigational interaction features or no interaction features… an overall effect size of Hedges's g = 0.522… However, if a video is not paused while an enhanced interaction feature is offered to the learners, a split-attention effect occurs, and learning is impeded." Chapters, timestamps and a scrub bar are *navigational* — the losing baseline. **No primary research establishes a benefit for chapters or timestamps.** Mayer's segmenting is system-paced, and its *d* = 0.79 came from click-to-continue ([clarity.md](clarity.md) §1), so a linear video inherits neither. Chapter it anyway, because a tutorial is consulted mid-task and the returning viewer needs one chapter in one click; `<track kind="chapters">` is a standard `<track>` kind ([MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/track)). Merkt et al. (2011), *Learning and Instruction* ([10.1016/j.learninstruc.2011.03.004](https://doi.org/10.1016/j.learninstruc.2011.03.004)) is DOI-verified but **unread, volume and pages unconfirmed** — not relied on.
 
-**Length.** G7 **[FT]**: "a length of between 15 to 60 seconds is optimal for keeping the user engaged"; the authors' own "average preview and procedural video was just over one minute"; and the rule that matters — "What matters more is that the user perceives a video as having a clear beginning and end. This generally means that the designer must look for structural changes such as goal or sub-goal completion." So **chapter boundaries follow thirdshift's own sub-goals**, which is what §5's headings are. *Inference:* eleven beats at 45–90 s lands at **7–10 minutes**, each chapter independently watchable; no source prescribes a total.
+**Length.** G7 **[FT]**: "a length of between 15 to 60 seconds is optimal for keeping the user engaged"; the authors' own "average preview and procedural video was just over one minute"; and the rule that matters — "What matters more is that the user perceives a video as having a clear beginning and end. This generally means that the designer must look for structural changes such as goal or sub-goal completion." So **chapter boundaries follow the product's own sub-goals**. *Inference:* for thirdshift, eleven beats at 45–90 s landed at **7–10 minutes**, each chapter independently watchable; no source prescribes a total.
 
 ## 4. Accessibility: what a procedure adds
 
-The clarity file's WCAG findings hold. Three additions.
+[clarity.md](clarity.md)'s WCAG findings hold. Three additions.
 
 - **Integrated description — speak every command and state change aloud.** 1.2.5 requires audio description; glossary Note 3 is the lever ("Where all of the video information is already provided in existing audio, no additional audio description is necessary") while Note 1 counts on-screen text among what description must cover. Narration that reads each command satisfies 1.2.3 and 1.2.5 with no AD track; "type this" does not. The trap is on point: Understanding 1.2.3's examples include a software training video where the presenter talks and demonstrates at once, leaving no gap for description, so an alternative for time-based media becomes necessary instead **[DEL]**. Script so the description *is* the narration. **W3C gives no guidance on how finely to read commands or code aloud** — unguided; the only principle is that everything on screen be available in the audio.
 - **Captions must not cover the terminal** — "Captions should not obscure or obstruct relevant information in the video" ([WCAG 2.2](https://www.w3.org/TR/WCAG22/#dfn-captions)). Terminal in the upper two-thirds.
 - **Print every command as copyable page text beside the video.** *Inference:* no criterion requires it, but it is the only real answer to §2.
 
-## 5. What the video must show, from the repo
+## 5. What the video must show
 
-**5.1 Prerequisites.** The account needs (`docs/guide.md:240-246`) the **Harness** "installed and authenticated: **`claude`** (Claude Code, the default), **`codex`**… or **`opencode`**"; "**`gh`** (GitHub CLI), logged in"; "**`git`** with a global `user.name` and `user.email`, and credentials that can push to the repository (`gh auth setup-git` makes git use `gh`'s login)"; "**`node`**… for a Security run only". Platforms: "x86_64 Linux (Rocky, Ubuntu and WSL2) and Apple Silicon macOS" (`README.md:19`). Two lines belong on screen: sessions "run headless with the full permissions of that user account, including `sudo` if the user has it, and nobody is there to approve anything" (`:249`), and "**Install the target repository's toolchains up front**" (`:257`). Show `type thirdshift claude gh git` — the guide's own idiom (`:228`, `:905`) — and `gh auth status`. **Output: not documented; record it.**
+This half is product-specific. Go command by command through the product's README, guide and site, and for each beat record the command, the output a viewer should expect, and its file:line. Then list the beats whose output the docs never show — installers, setup prompts, status commands and failures are the usual gaps — and record each live or drop it.
 
-**5.2 Install.** Verbatim (`README.md:13`):
+A getting-started tutorial usually runs: where we end up, prerequisites, install, setup, a first run, watching it, what comes back, when it fails, the advanced or scheduled use, and help and update.
 
-```sh
-curl -LsSf https://github.com/JacobStephens2/thirdshift/releases/latest/download/thirdshift-installer.sh | sh
-```
-
-The short redirect `curl -fsSL https://thirdshift.app/install.sh | sh` (`site/index.html:71`) "redirects to the same installer" (`docs/guide.md:209`). It "puts a single binary in `~/.local/bin`; no Rust toolchain or checkout of this repo is needed" (`README.md:15`) and "ends by pointing you to Setup" (`:211`). Alternative: `cargo install thirdshift` (`:215`). **Output: not documented.**
-
-**5.3 `thirdshift setup`.** Writes `~/.thirdshift/config.toml` (`:347`) "listing every setting at its default so the file itself shows what can be changed" (`:397`), printed in full at `:399-458`. From a terminal it asks eight things in order (`:465-472`): Harness, then its Model and Effort; `merge.always`; `base.fix`; `launch.pull`; `security.fix`; `security.review`; then notifications, address, sender and the Resend key "with input hidden". "Pressing Enter takes the default shown" (`:474`); it "prints the file's path on stderr and exits `0` with stdout empty". Only two prompt strings are quotable — `Resend API key (input hidden, Enter to skip):` (`:472`) and `No User config at <path>. Set your defaults now? [Y/n]` (`:476`). **The rest is described, not quoted: record the transcript.**
-
-**5.4 First Run.** Verbatim (`:268-270`):
-
-```sh
-cd ~/repos/widgets          # a clone of the issue's repository, on the Base branch
-thirdshift https://github.com/acme/widgets/issues/7
-```
-
-Shorthand is real (`:274-278`): `thirdshift 7`, `thirdshift merge 7`, `thirdshift --no-merge 7 harness codex`. "A Run takes minutes to tens of minutes" (`:288`). `no-merge`/`--no-merge` goes "before or after the URL" (`:296`); confirmed at `src/args.rs:459-460`.
-
-**Output — real and quotable.** `site/index.html:105` states the lines come from a real Pickup run on 2026-10-12; `:316` that they are "copied, timestamps and all, from the Pickup run's Command log… there are 139 lines on stderr in all." Use them in order from `:208-305`: `sessions run on codex · gpt-6.1-sol · high`, `labelling #663 in-progress, in place of ready-for-agent`, `creating worktree /home/jacob/repos/thirdshift-issue-663 on issue-663 from origin/main`; then session lines as `implement: $ <command>`, closing `implement: session ended after 26m 2s: 7416316 input tokens (7285760 cached), 20664 output tokens` (`:263`); then `pushing issue-663`, `checking the PR`, `merging origin/main into issue-663`, `waiting up to 60s for CI on c16e780`, `CI on c16e780: 6 of 8 checks still running`, `CI passed on c16e780`, `origin/main moved while CI ran; merging it again`, and the cleanup and merge lines ending `PR …/pull/665 is merged`.
-
-The format is fixed (`docs/guide.md:336`): every line "starts with the local time it was printed, as in `thirdshift: 12:14:49 pushing issue-7`"; the first names date and offset; a top-level Run prints `Took: 1h 2m 3s`; the last line is `PR <url> is ready for review` or `PR <url> is merged`. **stdout carries only the PR URL** — `url=$(thirdshift "$issue") && echo "ready: $url"` (`:334`). Two warnings: "Your checkout's uncommitted changes stay out of the Run. Push any Base branch commits first" (`README.md:37`), and blunter — "Unpushed commits on the Base branch are not: push them first, or the Run stops" (`docs/guide.md:343`).
-
-**5.5 Watching.** `thirdshift status` "names this host and lists live Commands across every repository in `logs.dir`, with their issue and title when present, Harness, Model, Effort, current stage and its age" (`:76`). Verbatim (`:166-172`):
-
-```sh
-thirdshift show 'widgets#7'
-thirdshift logs 'widgets#7' --session implement
-thirdshift logs 'widgets#7' --session repair --follow
-```
-
-`show` gives "the Runs, stage history with start times, outcomes, and Command and Session log paths" plus "its latest event, such as `Bash: cargo test`" (`:174`). `logs` "writes the Command log verbatim"; `--follow` "first prints the selected log, then flushes appended bytes until the owning Command ends or dies" (`:199`). Confirmed at `src/args.rs:254,269,280,299`. **Flag: the guide shows no human-readable sample output for `status`, `show` or `logs`.** The only rendered example is the idle line (`:82`): `Architect run idle on acme/widgets: Ready issue #7 "Make widgets" goes first: …`. Everything else is JSON (`:88`, `:138`, `:178`). Stage names are quotable (`:120`): `implement`, `Resume`, `Security review`, `pull request`, `CI watch`, `Repair`, `Self-merge`, `cleanup`.
-
-**5.6 What comes back, and a Failed run.** "Ready" means (`site/index.html:339`): "An open pull request from the Issue branch to the Base branch. It is mergeable, its CI passes, and it has been reviewed against your repository's documented coding standards and against the issue. Otherwise thirdshift doesn't call it ready." Findings the agent declined are "listed as an Unaddressed finding in the pull request body, with the code, plan decision, ADR or focused run that refutes it" (`:340`). A Failed run "ends… without an open pull request from its Issue branch that targets the Base branch, is mergeable and has passing CI" (`docs/guide.md:724`); it "commits any uncommitted work… and pushes the Issue branch, so nothing is lost" and converts an open PR "back to a draft" (`:728-729`). Rerunning is the same command — it "picks up where the last Run stopped" as a "**Continuation**" (`:712-721`) — with the caveat on screen: "A Run is not idempotent: re-running builds on whatever is already on the branch, including a Failed run's work-in-progress commit" (`:722`).
-
-The site's Failed-run block is explicitly hypothetical — "**Illustrative** … Their order is inferred from the code, not seen in a real Run" (`site/index.html:321-329`). **Prefer the one real failure transcript** (`docs/guide.md:745-752`), which prints the retry command:
-
-```
-thirdshift: 03:12:40 CI red on test, which also fails on main at 362b9ca; fix main first
-thirdshift: 03:12:40 Retry with: thirdshift https://github.com/acme/widgets/issues/7 base-fix
-```
-
-**5.7 Scheduling a Pickup run.** "thirdshift has no scheduler of its own… the operating system's scheduler runs the ordinary command" (`:1107`). Verbatim (`:1112-1115`):
-
-```
-PATH=/home/you/.local/bin:/home/you/.cargo/bin:/usr/local/bin:/usr/bin:/bin
-*/30 * * * * cd ~/repos/widgets && thirdshift pickup base main >> ~/.thirdshift/logs/cron.log 2>&1
-```
-
-Narrate three things (`:905`, `:1118`): `PATH` is set "because cron doesn't read your shell profile", and "cron expands neither `~` nor `$HOME` on that line"; `cd` "makes a clone of the repository the **Launch directory**" and `base main` names the Base branch "so the branch checked out in the clone doesn't matter"; and the throttles — "a pass takes one issue, so `*/30` starts at most one every half hour", "at 3 of them, or the `pickup.limit` you set, the passes take nothing until you have dealt with one", and a newly labelled issue "waits thirty minutes by default". Cautious variant: `… pickup base main no-merge` (`:1140`). Add with `crontab -e`, and "end each with a newline" (`:1136`). **Output is real** (`site/index.html:206-207`): `Pickup run starting, 2026-10-12 -0400`, then `taking Ready issue #663 "…", as thirdshift …/issues/663 would`.
-
-**5.8 `help` and `update`.** `help` prints "to stdout and exit `0`" (`docs/guide.md:339-341`); **the real text is `src/main.rs:60-103`**, opening "thirdshift turns a GitHub issue into a ready-for-review pull request, unattended." (`:61`), with `usage:` at `:63-84` and the shared-options block at `:92`. `update` "replaces the installed binary with the latest stable GitHub Release, or says it is already on it. Messages go to stderr and stdout stays empty" (`docs/guide.md:221-223`), and "only replaces a copy put in place by the shell installer", refusing "to touch any other copy" (`:227`). Confirmed at `src/args.rs:236,238`. **Output: not documented for either.**
-
-### 5.9 Output the docs never show — record it or drop the beat
-
-| Beat | Documented output? |
-| --- | --- |
-| The `curl` installer's own output | **No** (`README.md:13` gives the command only) |
-| The `setup` questions | Described, not quoted (`docs/guide.md:465-474`); two strings exist (`:472`, `:476`) |
-| `status` / `show` / `logs --follow` human output | **No sample anywhere** — only the idle line (`:82`) and JSON (`:88`, `:138`, `:178`) |
-| `thirdshift update` | **No sample** (`:221`) |
-| Prerequisite checks | **No sample** |
-| A Failed run's stderr | Only the "illustrative" block (`site/index.html:321`) and the real Inherited-failure block (`docs/guide.md:745`) |
-| A successful Run's stderr | **Real and complete** (`site/index.html:206-305`; 139 lines, `:316`) |
-
-## Tutorial cut: rules and outline
+## Tutorial cut: rules
 
 1. **One real terminal, rehearsed; never a rendered one** (§2). Re-type at human speed, cut every wait with a visible time jump.
-2. **Never show a line the binary does not print.** Quote `site/index.html:206-305`, `docs/guide.md:336`, `:745-752` and `src/main.rs:60-103` character for character; record everything else from life.
-3. **Caption any placeholder or reconstructed output as illustrative**, as the site does itself (`site/index.html:321`).
+2. **Never show a line the binary does not print.** Quote documented output character for character; record everything else from life.
+3. **Caption any placeholder or reconstructed output as illustrative.**
 4. **Terminal inside the 5% graphics-safe box and in the upper two-thirds**, bottom band reserved for captions (§2, §4).
 5. **Test the font size; no standard sets it.** *Inference:* longest line fits ~60–80 columns at 1080p, checked at phone width. Do not import the BBC 7–8% subtitle figure (§2).
 6. **Speak every command and state change aloud, and print each one as copyable page text beside the video.** The narration discharges 1.2.3 and 1.2.5 with no AD track ("type this" does not); the page text is the only answer to §2's legibility problem (§4).
-7. **Chapter on thirdshift's own sub-goals, not on a clock** — G7's "structural changes such as goal or sub-goal completion" (§3). One chapter per §5 heading, 45–90 s each, 7–10 min total.
+7. **Chapter on the product's own sub-goals, not on a clock** — G7's "structural changes such as goal or sub-goal completion" (§3). One chapter per sub-goal, 45–90 s each.
 8. **Claim chapters as convenience, never as a learning gain** — Ploetzner puts navigational features in the losing baseline (§3).
-9. **Preview the task: open on the finished pull request** (G4, §1).
-10. **Give the Failed run its own chapter and run the recovery command on screen** — direction borrowed from EMT, magnitude not claimed (§1).
-11. **Demonstrate thirdshift's decisions, not git, `gh` or cron syntax** (expertise reversal, §1).
+9. **Preview the task: open on the finished end state** (G4, §1).
+10. **Give the failure case its own chapter and run the recovery command on screen** — direction borrowed from EMT, magnitude not claimed (§1).
+11. **Demonstrate the product's decisions, not git, `gh` or cron syntax** (expertise reversal, §1).
 12. **End every chapter on an expected-output frame held still**, and offer the viewer nothing over moving video (Ploetzner's split-attention finding, §3).
-
-| # | Chapter | Beat: command | Expected output to show | Narration gist | Source |
-|---|---|---|---|---|---|
-| 0 | Where we end up | — | The merged PR and `PR …/pull/665 is merged` | "One issue URL in, one reviewed pull request out." | `site/index.html:305`, `:339`; G4 |
-| 1 | Prerequisites | `type thirdshift claude gh git`; `gh auth status` | **Record live — undocumented** | Harness + `gh` + git identity; sessions run as you, unattended, with no approver | `docs/guide.md:240-246`, `:249` |
-| 2 | Install | `curl -LsSf …/thirdshift-installer.sh \| sh` | **Record live**; end on the Setup pointer | One binary into `~/.local/bin`; no Rust, no checkout | `README.md:13-15`, `docs/guide.md:211` |
-| 3 | Setup | `thirdshift setup` | **Record the transcript**, then the written `config.toml` | Eight questions, Enter takes the default; the file lists every setting | `docs/guide.md:465-474`, `:399-458` |
-| 4 | Push first | `git push` before the Run | The rule as on-screen text | "Unpushed commits on the Base branch… push them first, or the Run stops" | `docs/guide.md:343`, `README.md:37` |
-| 5 | First Run | `cd ~/repos/widgets`; `thirdshift <Issue URL>` | `labelling #663 in-progress…`, `creating worktree …`, `implement: $ …`, `pushing issue-663`, `CI passed on …`, `PR <url> is ready for review` | Claim, worktree, one session implements *and* reviews, then thirdshift takes over deterministically | `docs/guide.md:268-270`, `:336`; `site/index.html:208-305` |
-| 6 | Watching | `thirdshift status`; `thirdshift show 'widgets#7'`; `thirdshift logs … --follow` | **Record live — no sample in docs**; name the stage on screen | Host, live Commands, stage and age; `show` adds the latest event; `logs --follow` tails | `docs/guide.md:76`, `:174`, `:199`; `src/args.rs:254,269,280` |
-| 7 | What comes back | The PR body on GitHub | The ready-for-review definition; one Unaddressed finding | "Otherwise thirdshift doesn't call it ready" | `site/index.html:339-340` |
-| 8 | When it fails | re-run the same command | `CI red on test, which also fails on main…`; `Retry with: … base-fix` | Work is committed and pushed, the PR drops to draft, the same command continues it — and it is not idempotent | `docs/guide.md:724-729`, `:745-752`, `:712-722` |
-| 9 | Merging | `thirdshift merge <Issue URL>` / `--no-merge` | `merging the PR into main`; `PR <url> is merged` | Self-merge only once open, ready, mergeable and green; never GitHub auto-merge | `docs/guide.md:293-296`; `site/index.html:268`, `:304-305`; `src/args.rs:459` |
-| 10 | On a schedule | `crontab -e`, paste the `PATH` + `*/30` lines | `Pickup run starting, 2026-10-12 -0400`; `taking Ready issue #663 …` | thirdshift schedules nothing; `PATH` because cron reads no profile; one issue per pass, 3 Claims and it stops | `docs/guide.md:1107-1122`; `site/index.html:206-207` |
-| 11 | Help and update | `thirdshift help`; `thirdshift update` | The real help text; **record `update` live** | Where to look next; `update` only touches a shell-installer copy | `src/main.rs:60-103`; `docs/guide.md:221-227` |

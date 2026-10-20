@@ -2,20 +2,21 @@
 
 ## Research to reuse
 
-Six cited notes, written for the [thirdshift](https://github.com/JacobStephens2/thirdshift) videos, under [`docs/research/`](https://github.com/JacobStephens2/thirdshift/blob/main/docs/research/). The first five apply to any product, and each ends in checkable rules:
+Five cited notes in [`research/`](research/), each ending in checkable rules:
 
-- [`explainer-video-clarity.md`](https://github.com/JacobStephens2/thirdshift/blob/main/docs/research/explainer-video-clarity.md):
+- [`clarity.md`](research/clarity.md):
   - narration at 160–185 wpm, spoken rather than printed as a script;
   - 2–3 word labels beside what they name;
   - one idea per beat, and terms before use;
   - one colour plus one shape per actor;
   - swimlanes, signalling with colour rather than arrows;
   - captions as a toggleable track.
-- [`explainer-video-music.md`](https://github.com/JacobStephens2/thirdshift/blob/main/docs/research/explainer-video-music.md): music only where there's no narration, or as a bed at least 20 dB below the voice; −16 LUFS, true peak −1 dBTP; ElevenLabs music terms.
-- [`explainer-video-audiences.md`](https://github.com/JacobStephens2/thirdshift/blob/main/docs/research/explainer-video-audiences.md): executive cuts versus engineer cuts. Executive cuts give the answer first, cite no speed numbers, speak one limit, end on a low-commitment call to action and keep claims FTC-safe.
-- [`explainer-video-marketing.md`](https://github.com/JacobStephens2/thirdshift/blob/main/docs/research/explainer-video-marketing.md): sound-off feeds with burned-in text, about 25 s, in 16:9 plus 4:5. YouTube files a square-or-taller video under 3 min as a Short.
-- [`explainer-video-tutorial.md`](https://github.com/JacobStephens2/thirdshift/blob/main/docs/research/explainer-video-tutorial.md): procedural video. Preview the end state, put chapters on sub-goals, show **real output** and end each chapter on a still output frame.
-- [`explainer-newcomer-concepts.md`](https://github.com/JacobStephens2/thirdshift/blob/main/docs/research/explainer-newcomer-concepts.md): thirdshift's own terms and misconceptions, as a model for the product-specific note a new video needs.
+- [`music.md`](research/music.md): music only where there's no narration, or as a bed at least 20 dB below the voice; −16 LUFS, true peak −1 dBTP; ElevenLabs music terms.
+- [`audiences.md`](research/audiences.md): executive cuts versus engineer cuts. Executive cuts give the answer first, cite no speed numbers, speak one limit, end on a low-commitment call to action and keep claims FTC-safe.
+- [`marketing.md`](research/marketing.md): sound-off feeds with burned-in text, about 25 s, in 16:9 plus 4:5. YouTube files a square-or-taller video under 3 min as a Short.
+- [`tutorial.md`](research/tutorial.md): procedural video. Preview the end state, put chapters on sub-goals, show **real output** and end each chapter on a still output frame.
+
+Each new product also needs its own note: terms and misconceptions, what its docs substantiate, and a sourced beat outline. thirdshift's, under [`docs/research/`](https://github.com/JacobStephens2/thirdshift/tree/main/docs/research) (`explainer-newcomer-concepts.md` and the `explainer-video-*.md` halves), is a model.
 
 ## Scenes and timing
 

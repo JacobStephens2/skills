@@ -1,6 +1,6 @@
-# Background music in the thirdshift explainer video
+# Background music in a narrated explainer video
 
-Research date: 2026-10-19.
+Research date: 2026-10-19. Researched for the [thirdshift](https://github.com/JacobStephens2/thirdshift) explainer videos, then generalised.
 
 **Question.** Should a 60–120 s narrated animated explainer about a developer CLI use background music, and if so how loud, where, and generated how? Clarity is the top priority; narration comes from ElevenLabs TTS.
 
@@ -14,7 +14,7 @@ Research date: 2026-10-19.
 - **Sound effects differ from music.** Effects in one-to-one correspondence with a depicted event did no measurable harm; repetitive effects over unrelated events did (same paper).
 - **If music appears, confine it to the non-narrated head and tail** — an inference from the auditory-overload mechanism, not a tested condition; I found no study comparing music *during* vs *between* narration.
 - **Normative mix numbers exist** (§2, and the rules at the end). "YouTube normalizes to −14 LUFS" is **not** among them — it is absent from YouTube's own docs.
-- **ElevenLabs generates instrumental music** (`POST /v1/music`, `force_instrumental: true`), but this account is **Starter**, where the music terms grant commercial use "For Individual Use Only" and bar streaming distribution — a licensing risk for a company video.
+- **ElevenLabs generates instrumental music** (`POST /v1/music`, `force_instrumental: true`), but on Free through Pro plans the music terms grant commercial use "For Individual Use Only", and Free and Starter also bar streaming distribution — a licensing risk for a company video.
 
 ## 1. Learning-science evidence
 
@@ -54,7 +54,7 @@ No Cohen's *d* is reported. **My own calculation** from Experiment 1: d ≈ 1.06
 
 **Licensing** — terms at [`elevenlabs.io/music-terms`](https://elevenlabs.io/music-terms), linked from `/service-specific-terms` (`/terms-of-use/music` 404s). Exhibit A: Free/Starter/Creator/Pro permit commercial use but "For Individual Use Only"; Scale caps at under 10 employees, Business under 50; media rights read "All online and offline commercial use permitted, except film, TV, radio, and Studio Games." Streaming distribution is prohibited on Free and Starter. Free requires attribution, other plans none. §2.2: "you retain any and all rights in and to your Input and Output"; §3.1 puts clearance on you; §2.1 bars prompts naming real artists/songs/labels. [Terms of Use](https://elevenlabs.io/terms-of-use) §1(c) restricts free accounts to non-commercial use.
 
-**This machine (read-only probe).** `GET /v1/user/subscription` → 200, `tier: "starter"`, active, 951 / 50 732 characters used. `GET /v1/models` → 200, eleven TTS/STS models; `music_*` models are **not** listed there. So music generation is available here, but under "individual use only" terms — an awkward fit for a company product video. Flag for a human decision.
+**The account researched (read-only probe).** `GET /v1/user/subscription` → 200, `tier: "starter"`. `GET /v1/models` → 200, eleven TTS/STS models; `music_*` models are **not** listed there, yet music generation is available. On Starter that means "individual use only" terms — an awkward fit for a company product video. Check the tier the same way, and flag it for a human decision.
 
 **Sync** — [`POST /v1/text-to-speech/{voice_id}/with-timestamps`](https://elevenlabs.io/docs/api-reference/text-to-speech/convert-with-timestamps) returns `audio_base64` plus `alignment` and `normalized_alignment`, each with equal-length `characters`, `character_start_times_seconds`, `character_end_times_seconds` — enough to drive animation cues off narration. Stitching: `previous_text`/`next_text` and `previous_request_ids`/`next_request_ids` (max 3 each; text fields ignored when the matching ids are sent). `enable_logging: false` disables request stitching (enterprise only); `seed` is best-effort.
 
@@ -62,7 +62,7 @@ No Cohen's *d* is reported. **My own calculation** from Experiment 1: d ≈ 1.06
 
 Better when licensing must be unambiguous (no plan tier, no individual-use question, no attribution, no C2PA), the build must be deterministic in CI, and level/fade/gating are set in code — so it is trivially silent under narration and rendered at a known loudness. Worse when audible for long: a synthetic drone sounds amateurish and, by the coherence mechanism, is as extraneous as produced music; it gives no arc for an intro sting, and naively summed oscillators risk beating and aliasing. Verdict: with music only in head and tail, the code loop is lower-risk; generated music pays off only if someone wants a real hook. **Flagged:** no study found comparing a synthesized drone against produced music.
 
-## Rules for the thirdshift explainer's audio
+## Rules for an explainer's audio
 
 1. **No music and no sound effects while the narration is speaking** ([Moreno & Mayer 2000](https://doi.org/10.1037/0022-0663.92.1.117)).
 2. **Music only in the non-narrated head and tail, ≤5 s total**, fully faded before the first narrated word.
@@ -72,5 +72,5 @@ Better when licensing must be unambiguous (no plan tier, no individual-use quest
 6. **Don't gate on Loudness Range** — R 128 footnote 2: LRA is not recommended under 1 minute.
 7. **A sound effect ships only in one-to-one correspondence with an on-screen event** (one tick per depicted keypress); no repeated UI stings, no transition whooshes (Moreno & Mayer, Exp 1 vs Exp 2).
 8. **If generating music:** `POST /v1/music` with `force_instrumental: true`, `model_id: "music_v2_5"`, an exact `music_length_ms`, `output_format` `mp3_48000_192` or PCM — never leave lyrics possible.
-9. **Clear the licence first:** this **Starter** account's music terms permit commercial use "For Individual Use Only" and bar streaming distribution ([music-terms](https://elevenlabs.io/music-terms)); confirm eligibility in writing or ship the code-generated loop.
+9. **Clear the licence first:** check the tier (`GET /v1/user/subscription`); Free through Pro permit commercial use "For Individual Use Only", and Free and Starter bar streaming distribution ([music-terms](https://elevenlabs.io/music-terms)); confirm eligibility in writing or ship the code-generated loop.
 10. **Render narration via `/with-timestamps`** and drive every visual cue from `character_end_times_seconds`; stitch segments with `previous_text`/`previous_request_ids` so joins don't drift.
