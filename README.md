@@ -15,7 +15,6 @@ name, description, and instructions, plus any supporting scripts or references.
 | --- | --- |
 | [`explainer-video`](skills/explainer-video/) | Make narrated, animated explainer videos as HTML scenes rendered to MP4, with animation synced to the narration's words. |
 | [`granola-transcripts`](skills/granola-transcripts/) | Retrieve Granola meeting transcripts through the API with timestamps and source attribution. |
-| [`implement-spec`](skills/implement-spec/) | Complete a specification's tickets in dependency order, using a subagent round per ticket with verification before landing. |
 
 ## Install
 
@@ -34,7 +33,7 @@ for skill in "$PWD"/skills/*/; do
 done
 ```
 
-Invoke a skill by name, for example `$granola-transcripts` or `$implement-spec`.
+Invoke a skill by name, for example `$granola-transcripts` or `$explainer-video`.
 Granola transcript retrieval uses `GRANOLA_API_KEY` from the environment.
 Explainer video narration uses `ELEVENLABS_API_KEY`; rendering needs Node with
 Playwright (Chromium) and ffmpeg.
@@ -43,4 +42,4 @@ Playwright (Chromium) and ffmpeg.
 
 Link the same source directories into `~/.claude/skills/` for personal use or
 `.claude/skills/` within another project. Invoke them as `/granola-transcripts`
-or `/implement-spec`.
+or `/explainer-video`.
