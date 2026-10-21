@@ -7,7 +7,7 @@ The file a grill-with-docs session writes its rounds into, one file per issue in
 1. **Re-read the whole file.** Jacob's editor can save a stale copy over rounds added since he opened it. Put back anything missing, and keep every answer he wrote.
 2. **Record the answers.** Mark the round `(answered)`. Put any facts you checked in reply under the answer they bear on, as `*Checked:* …`.
 3. **List what follows from the answers** under "Settled by earlier answers": every consequence they imply, so that nothing settled stays unspoken.
-4. **Write the next frontier** as `## Round N (open)`, numbering questions on from the last. Each question ends on a blank answer line.
+4. **Write the next frontier** as `## Round N (open)`, numbering its questions `QN.1`, `QN.2` and on (see "Question numbers"). Each question ends on a blank answer line.
 5. **Move research.** Findings go to "Research results", with how each was confirmed. Pending work goes to "Waiting on research", naming the questions that wait on it.
 6. **Reply in chat** with a few lines that point at the file.
 
@@ -16,6 +16,10 @@ The round is done when every question in the file has an answer line, every open
 ## The answer line
 
 `*Answer:* `, with one space after the closing `*`. Jacob writes in Flintmark, where a click at the end of the line then puts the cursor after the italic, so his typing lands outside it. "agree" means he accepts the recommendation.
+
+## Question numbers
+
+Each question is numbered `<round>.<question>`: Q3.2 is Round 3's second question, and each new round starts again at 1. A question's number then says which round asked it, and it never changes, so use it everywhere: in the file, in chat, and in the Specs and Tickets that follow.
 
 ## Layout
 
@@ -27,13 +31,13 @@ Research: <links>
 
 ## Round 1 (answered)
 
-**Q1 - <title>.** <question and options>
+**Q1.1 - <title>.** <question and options>
 
 *Answer:* <answer>
 
 ## Round N (open)
 
-**QN - <title>.** <What has to be decided, why it matters, and which settled answers it builds on.> The options:
+**QN.1 - <title>.** <What has to be decided, why it matters, and which settled answers it builds on.> The options:
 - (a) <option>
 - (b) <option>
 
@@ -51,5 +55,5 @@ Research: <links>
 
 ## Waiting on research
 
-- <what an agent is finding out>, for <QN>
+- <what an agent is finding out>, for <QN.n>
 ```
