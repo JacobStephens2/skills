@@ -15,6 +15,7 @@ name, description, and instructions, plus any supporting scripts or references.
 | --- | --- |
 | [`explainer-video`](skills/explainer-video/) | Make narrated, animated explainer videos as HTML scenes rendered to MP4, with animation synced to the narration's words. |
 | [`granola-transcripts`](skills/granola-transcripts/) | Retrieve Granola meeting transcripts through the API with timestamps and source attribution. |
+| [`primary-source-research`](skills/primary-source-research/) | Five-step anti-sycophancy primary-source research protocol with scholarly API retrieval, replication checks, and blind single-dissenter audits. |
 
 ## Install
 
@@ -33,13 +34,15 @@ for skill in "$PWD"/skills/*/; do
 done
 ```
 
-Invoke a skill by name, for example `$granola-transcripts` or `$explainer-video`.
+Invoke a skill by name, for example `$granola-transcripts`, `$explainer-video`, or `$primary-source-research`.
 Granola transcript retrieval uses `GRANOLA_API_KEY` from the environment.
 Explainer video narration uses `ELEVENLABS_API_KEY`; rendering needs Node with
 Playwright (Chromium) and ffmpeg.
+Primary-source research optionally uses `OPENALEX_API_KEY`, `SEMANTIC_SCHOLAR_API_KEY`,
+`NCBI_API_KEY`, `COURTLISTENER_API_TOKEN`, and `RESEARCH_EMAIL`.
 
 ### Claude Code
 
 Link the same source directories into `~/.claude/skills/` for personal use or
-`.claude/skills/` within another project. Invoke them as `/granola-transcripts`
-or `/explainer-video`.
+`.claude/skills/` within another project. Invoke them as `/granola-transcripts`,
+`/explainer-video`, or `/primary-source-research`.
